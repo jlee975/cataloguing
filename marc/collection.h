@@ -71,7 +71,7 @@ public:
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     std::string get_tag() const;
-    std::string get_content() const;
+    const std::string& get_content() const;
 private:
     char tag_;
 
