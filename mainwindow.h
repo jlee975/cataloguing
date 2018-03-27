@@ -6,6 +6,9 @@
 
 #include "marc/database.h"
 
+#include "collectionmodel.h"
+#include "recordmodel.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,10 +24,13 @@ public:
 private slots:
     void on_listView_activated(const QModelIndex &index);
 
+    void on_actionImport_triggered();
+
 private:
     Ui::MainWindow *ui;
     marc::Database database;
-    QAbstractItemModel* record_model;
+    CollectionModel* collection_model;
+    RecordModel* record_model;
 };
 
 #endif // MAINWINDOW_H

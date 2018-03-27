@@ -79,6 +79,11 @@ public:
         return nodes.at(i).value;
     }
 
+    void swap(tree& o)
+    {
+        nodes.swap(o.nodes);
+        roots.swap(o.roots);
+    }
 private:
     struct node
     {

@@ -10,7 +10,7 @@ class CollectionModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit CollectionModel(marc::Database*, QObject *parent = nullptr);
+    explicit CollectionModel(QObject *parent = nullptr);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -25,6 +25,8 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    void clear();
+    void reset(marc::Database*);
 private:
     marc::Database* db;
 };

@@ -1,7 +1,7 @@
 #include "collectionmodel.h"
 
-CollectionModel::CollectionModel(marc::Database* db_, QObject *parent)
-    : QAbstractItemModel(parent), db(db_)
+CollectionModel::CollectionModel(QObject *parent)
+    : QAbstractItemModel(parent), db(nullptr)
 {
 }
 
@@ -33,7 +33,7 @@ QModelIndex CollectionModel::parent(const QModelIndex &index) const
 
 int CollectionModel::rowCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
+    if (db && !parent.isValid())
         return db->size(0);
     return 0;
 }
@@ -48,14 +48,26 @@ int CollectionModel::columnCount(const QModelIndex &parent) const
 
 QVariant CollectionModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
-
-    if (role == Qt::DisplayRole)
+    if (db && index.isValid())
     {
-        if (index.column() == 0)
-            return QString::fromStdString(db->label(0, index.row()));
+        if (role == Qt::DisplayRole)
+        {
+            if (index.column() == 0)
+                return QString::fromStdString(db->label(0, index.row()));
+        }
     }
 
     return QVariant();
+}
+
+void CollectionModel::clear()
+{
+    reset(nullptr);
+}
+
+void CollectionModel::reset(marc::Database * p)
+{
+    beginResetModel();
+    db = p;
+    endResetModel();
 }

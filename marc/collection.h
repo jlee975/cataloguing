@@ -14,6 +14,8 @@ enum class subfield_code : unsigned char { first = 33, last = 126 };
 std::string_view to_string(indicator_type);
 std::string_view to_string(subfield_code);
 
+/// @todo IDs must start with a letter or underscore, and can only contain letters, digits, underscores, hyphens, and periods
+/// Specifically must be an NCName (so unicode letters are allowed)
 class Identifier
 {
 public:
@@ -21,6 +23,17 @@ public:
     explicit Identifier(std::string);
 private:
     std::string id_;
+};
+
+/// @todo As an enum
+class Tag
+{
+public:
+    Tag() = default;
+    explicit Tag(const char*);
+    std::string_view to_string() const;
+private:
+    char value[3];
 };
 
 class MarcBase
@@ -34,8 +47,6 @@ public:
 private:
     virtual void set_attribute_(const char*, const char*) = 0;
 
-    /// @todo IDs must start with a letter or underscore, and can only contain letters, digits, underscores, hyphens, and periods
-    /// Specifically must be an NCName (so unicode letters are allowed)
     Identifier id_;
 };
 
@@ -61,7 +72,7 @@ public:
     void append(SubField&&);
     std::size_t num_subfields() const;
     const SubField& get_subfield(std::size_t) const;
-    std::string_view get_tag() const;
+    const Tag& get_tag() const;
     indicator_type get_indicator1() const;
     indicator_type get_indicator2() const;
 private:
@@ -71,7 +82,7 @@ private:
     /// Use an enum
     /// Ex., 010 Library of Congress Control Number
     /// Ex., 020 International Standard Book Number (ISBN)
-    char tag_[3];
+    Tag tag_;
 
     /// @todo enum
     indicator_type ind1_;
@@ -85,10 +96,10 @@ public:
     classification_type classify() const final;
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
-    std::string_view get_tag() const;
+    const Tag& get_tag() const;
     const std::string& get_content() const;
 private:
-    char tag_;
+    Tag tag_;
 
     std::string content_;
 };
