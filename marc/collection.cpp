@@ -12,7 +12,7 @@ const char ind2_tag[] = "\x69\x6e\x64\x32";
 const char code_tag[] = "\x63\x6f\x64\x65";
 const char type_tag[] = "\x74\x79\x70\x65";
 
-const char ascii_character_strings[256] = {
+const char ascii_character_strings[128] = {
     '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f',
     '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f',
     ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
@@ -187,14 +187,19 @@ const SubField &DataField::get_subfield(std::size_t i) const
     return subfields_.at(i);
 }
 
-std::string DataField::get_tag() const
+std::string_view DataField::get_tag() const
 {
-    return std::string(tag_, 3);
+    return { tag_, 3 };
 }
 
-std::string DataField::get_indicators() const
+std::string_view DataField::get_indicator1() const
 {
-    return std::string() + "ind1='" + ind1_ + "'; ind2='" + ind2_ + "'";
+    return {ascii_character_strings + static_cast< unsigned char >(ind1_), 1 };
+}
+
+std::string_view DataField::get_indicator2() const
+{
+    return {ascii_character_strings + static_cast< unsigned char >(ind2_), 1 };
 }
 
 classification_type ControlField::classify() const

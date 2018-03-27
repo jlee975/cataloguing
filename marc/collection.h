@@ -35,9 +35,8 @@ public:
     std::string_view get_code() const;
     const std::string& get_content() const;
 private:
-    char code_;
-
     std::string content_;
+    char code_;
 };
 
 class DataField : public MarcBase
@@ -48,8 +47,9 @@ public:
     void append(SubField&&);
     std::size_t num_subfields() const;
     const SubField& get_subfield(std::size_t) const;
-    std::string get_tag() const;
-    std::string get_indicators() const;
+    std::string_view get_tag() const;
+    std::string_view get_indicator1() const;
+    std::string_view get_indicator2() const;
 private:
     std::vector< SubField > subfields_;
 

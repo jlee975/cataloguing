@@ -16,7 +16,15 @@ RecordModel::RecordModel(marc::Record r_, QObject *parent)
     for (std::size_t i = 0; i < r_.num_datafields(); ++i)
     {
         const marc::DataField& f = r_.get_datafield(i);
-        const std::size_t j = tree_.add_root(derp{QString::fromStdString(f.get_tag()), QString::fromStdString(f.get_indicators())});
+        const std::string_view& t = f.get_tag();
+        const std::string_view& ind1 = f.get_indicator1();
+        const std::string_view& ind2 = f.get_indicator2();
+        std::string ind = "ind1='";
+        ind.append(ind1);
+        ind += "'; ind2='";
+        ind.append(ind2);
+        ind += "'";
+        const std::size_t j = tree_.add_root(derp{QString::fromLatin1(t.data(), t.length()), QString::fromStdString(ind)});
         for (std::size_t k = 0; k < r_.get_datafield(i).num_subfields(); ++k)
         {
             const std::string_view& s = f.get_subfield(k).get_code();
