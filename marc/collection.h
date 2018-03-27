@@ -8,9 +8,11 @@
 namespace marc
 {
 enum classification_type { invalid, collection, record, leader, controlfield, datafield, subfield };
-enum indicator_type : char { first = 32, last = 122 };
+enum class indicator_type : unsigned char { first = 32, last = 122 };
+enum class subfield_code : unsigned char { first = 33, last = 126 };
 
 std::string_view to_string(indicator_type);
+std::string_view to_string(subfield_code);
 
 class Identifier
 {
@@ -44,11 +46,11 @@ public:
     classification_type classify() const final;
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
-    std::string_view get_code() const;
+    subfield_code get_code() const;
     const std::string& get_content() const;
 private:
     std::string content_;
-    char code_;
+    subfield_code code_;
 };
 
 class DataField : public MarcBase

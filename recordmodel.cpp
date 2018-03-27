@@ -26,7 +26,7 @@ RecordModel::RecordModel(marc::Record r_, QObject *parent)
         tree_.add_child(j, derp{"ind2", QString::fromLatin1(ind2.data(), ind2.length())});
         for (std::size_t k = 0; k < r_.get_datafield(i).num_subfields(); ++k)
         {
-            const std::string_view& s = f.get_subfield(k).get_code();
+            const std::string_view& s = to_string(f.get_subfield(k).get_code());
             tree_.add_child(j, derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(f.get_subfield(k).get_content())});
         }
     }

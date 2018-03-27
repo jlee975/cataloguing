@@ -116,7 +116,12 @@ namespace marc
 {
 std::string_view to_string(indicator_type t)
 {
-    return {ascii_character_strings + t, 1 };
+    return {ascii_character_strings + static_cast< unsigned char >(t), 1 };
+}
+
+std::string_view to_string(subfield_code c)
+{
+    return {ascii_character_strings + static_cast< unsigned char >(c), 1 };
 }
 
 void MarcBase::set_attribute(const char* name, const char* content)
@@ -151,7 +156,7 @@ void SubField::set_attribute_(const char* name, const char* content)
     if (std::strcmp(name, code_tag) == 0)
     {
         if (allowed_code_character(content[0]) && content[1] == '\0')
-            code_ = content[0];
+            code_ = static_cast< subfield_code >(content[0]);
         else
             throw std::runtime_error("Unrecognized subfield code");
     }
@@ -163,9 +168,9 @@ void SubField::add_text(const char * content)
     content_ += content;
 }
 
-std::string_view SubField::get_code() const
+subfield_code SubField::get_code() const
 {
-    return { ascii_character_strings + static_cast< unsigned char >(code_), 1 };
+    return code_;
 }
 
 const std::string& SubField::get_content() const
