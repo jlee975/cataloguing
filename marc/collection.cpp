@@ -12,6 +12,17 @@ const char ind2_tag[] = "\x69\x6e\x64\x32";
 const char code_tag[] = "\x63\x6f\x64\x65";
 const char type_tag[] = "\x74\x79\x70\x65";
 
+const char ascii_character_strings[256] = {
+    '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f',
+    '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f',
+    ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
+    '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', '\x7f'
+};
+
 namespace
 {
 // "[\dA-Za-z!"#$%&'()*+,-./:;<=>?{}_^`~\[\]\\]{1}"
@@ -91,6 +102,11 @@ void MarcBase::add_text(const char * content)
 }
 
 
+SubField::SubField() : code_()
+{
+
+}
+
 classification_type SubField::classify() const
 {
     return subfield;
@@ -113,12 +129,12 @@ void SubField::add_text(const char * content)
     content_ += content;
 }
 
-std::string SubField::get_code() const
+std::string_view SubField::get_code() const
 {
-    return std::string(1, code_);
+    return { ascii_character_strings + static_cast< unsigned char >(code_), 1 };
 }
 
-std::string SubField::get_content() const
+const std::string& SubField::get_content() const
 {
     return content_;
 }

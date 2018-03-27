@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <string_view>
 
 namespace marc
 {
@@ -27,11 +28,12 @@ private:
 class SubField : public MarcBase
 {
 public:
+    SubField();
     classification_type classify() const final;
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
-    std::string get_code() const;
-    std::string get_content() const;
+    std::string_view get_code() const;
+    const std::string& get_content() const;
 private:
     char code_;
 
