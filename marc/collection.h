@@ -8,6 +8,18 @@
 namespace marc
 {
 enum classification_type { invalid, collection, record, leader, controlfield, datafield, subfield };
+enum indicator_type : char { first = 32, last = 122 };
+
+std::string_view to_string(indicator_type);
+
+class Identifier
+{
+public:
+    Identifier() = default;
+    explicit Identifier(std::string);
+private:
+    std::string id_;
+};
 
 class MarcBase
 {
@@ -22,7 +34,7 @@ private:
 
     /// @todo IDs must start with a letter or underscore, and can only contain letters, digits, underscores, hyphens, and periods
     /// Specifically must be an NCName (so unicode letters are allowed)
-    std::string id_;
+    Identifier id_;
 };
 
 class SubField : public MarcBase
@@ -48,8 +60,8 @@ public:
     std::size_t num_subfields() const;
     const SubField& get_subfield(std::size_t) const;
     std::string_view get_tag() const;
-    std::string_view get_indicator1() const;
-    std::string_view get_indicator2() const;
+    indicator_type get_indicator1() const;
+    indicator_type get_indicator2() const;
 private:
     std::vector< SubField > subfields_;
 
@@ -59,9 +71,10 @@ private:
     /// Ex., 020 International Standard Book Number (ISBN)
     char tag_[3];
 
-    char ind1_;
+    /// @todo enum
+    indicator_type ind1_;
 
-    char ind2_;
+    indicator_type ind2_;
 };
 
 class ControlField : public MarcBase
@@ -70,7 +83,7 @@ public:
     classification_type classify() const final;
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
-    std::string get_tag() const;
+    std::string_view get_tag() const;
     const std::string& get_content() const;
 private:
     char tag_;
@@ -84,7 +97,7 @@ public:
     classification_type classify() const final;
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
-    std::string get_content() const;
+    const std::string& get_content() const;
 private:
     /// @todo "[\d ]{5}[\dA-Za-z ]{1}[\dA-Za-z]{1}[\dA-Za-z ]{3}(2| )(2| )[\d ]{5}[\dA-Za-z ]{3}(4500|    )"
     /// Each block of bytes has meaning. Could easily chop a few bytes
@@ -115,7 +128,7 @@ public:
     void append(Leader&&);
     void append(ControlField&&);
     void append(DataField&&);
-    std::string label() const;
+    const std::string& label() const;
     std::size_t num_leaders() const;
     const Leader& get_leader(std::size_t) const;
     std::size_t num_controlfields() const;
@@ -137,8 +150,8 @@ public:
     void set_attribute_(const char*, const char*) final;
     void append(Record&&);
     std::size_t size() const;
-    std::string label(std::size_t) const;
-    Record record(std::size_t) const;
+    const std::string& label(std::size_t) const;
+    const Record& record(std::size_t) const;
 private:
     std::vector< Record > records;
 };

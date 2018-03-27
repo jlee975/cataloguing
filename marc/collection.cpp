@@ -31,6 +31,27 @@ const char ascii_character_strings[256] = {
     '\xf0', '\xf1', '\xf2', '\xf3', '\xf4', '\xf5', '\xf6', '\xf7', '\xf8', '\xf9', '\xfa', '\xfb', '\xfc', '\xfd', '\xfe', '\xff',
 };
 
+const char zero_zero_strings[256 * 3] = {
+    '0', '0', '\x00', '0', '0', '\x01', '0', '0', '\x02', '0', '0', '\x03', '0', '0', '\x04', '0', '0', '\x05', '0', '0', '\x06', '0', '0', '\x07', '0', '0', '\x08', '0', '0', '\x09', '0', '0', '\x0a', '0', '0', '\x0b', '0', '0', '\x0c', '0', '0', '\x0d', '0', '0', '\x0e', '0', '0', '\x0f',
+    '0', '0', '\x10', '0', '0', '\x11', '0', '0', '\x12', '0', '0', '\x13', '0', '0', '\x14', '0', '0', '\x15', '0', '0', '\x16', '0', '0', '\x17', '0', '0', '\x18', '0', '0', '\x19', '0', '0', '\x1a', '0', '0', '\x1b', '0', '0', '\x1c', '0', '0', '\x1d', '0', '0', '\x1e', '0', '0', '\x1f',
+    '0', '0', '\x20', '0', '0', '\x21', '0', '0', '\x22', '0', '0', '\x23', '0', '0', '\x24', '0', '0', '\x25', '0', '0', '\x26', '0', '0', '\x27', '0', '0', '\x28', '0', '0', '\x29', '0', '0', '\x2a', '0', '0', '\x2b', '0', '0', '\x2c', '0', '0', '\x2d', '0', '0', '\x2e', '0', '0', '\x2f',
+    '0', '0', '\x30', '0', '0', '\x31', '0', '0', '\x32', '0', '0', '\x33', '0', '0', '\x34', '0', '0', '\x35', '0', '0', '\x36', '0', '0', '\x37', '0', '0', '\x38', '0', '0', '\x39', '0', '0', '\x3a', '0', '0', '\x3b', '0', '0', '\x3c', '0', '0', '\x3d', '0', '0', '\x3e', '0', '0', '\x3f',
+    '0', '0', '\x40', '0', '0', '\x41', '0', '0', '\x42', '0', '0', '\x43', '0', '0', '\x44', '0', '0', '\x45', '0', '0', '\x46', '0', '0', '\x47', '0', '0', '\x48', '0', '0', '\x49', '0', '0', '\x4a', '0', '0', '\x4b', '0', '0', '\x4c', '0', '0', '\x4d', '0', '0', '\x4e', '0', '0', '\x4f',
+    '0', '0', '\x50', '0', '0', '\x51', '0', '0', '\x52', '0', '0', '\x53', '0', '0', '\x54', '0', '0', '\x55', '0', '0', '\x56', '0', '0', '\x57', '0', '0', '\x58', '0', '0', '\x59', '0', '0', '\x5a', '0', '0', '\x5b', '0', '0', '\x5c', '0', '0', '\x5d', '0', '0', '\x5e', '0', '0', '\x5f',
+    '0', '0', '\x60', '0', '0', '\x61', '0', '0', '\x62', '0', '0', '\x63', '0', '0', '\x64', '0', '0', '\x65', '0', '0', '\x66', '0', '0', '\x67', '0', '0', '\x68', '0', '0', '\x69', '0', '0', '\x6a', '0', '0', '\x6b', '0', '0', '\x6c', '0', '0', '\x6d', '0', '0', '\x6e', '0', '0', '\x6f',
+    '0', '0', '\x70', '0', '0', '\x71', '0', '0', '\x72', '0', '0', '\x73', '0', '0', '\x74', '0', '0', '\x75', '0', '0', '\x76', '0', '0', '\x77', '0', '0', '\x78', '0', '0', '\x79', '0', '0', '\x7a', '0', '0', '\x7b', '0', '0', '\x7c', '0', '0', '\x7d', '0', '0', '\x7e', '0', '0', '\x7f',
+    '0', '0', '\x80', '0', '0', '\x81', '0', '0', '\x82', '0', '0', '\x83', '0', '0', '\x84', '0', '0', '\x85', '0', '0', '\x86', '0', '0', '\x87', '0', '0', '\x88', '0', '0', '\x89', '0', '0', '\x8a', '0', '0', '\x8b', '0', '0', '\x8c', '0', '0', '\x8d', '0', '0', '\x8e', '0', '0', '\x8f',
+    '0', '0', '\x90', '0', '0', '\x91', '0', '0', '\x92', '0', '0', '\x93', '0', '0', '\x94', '0', '0', '\x95', '0', '0', '\x96', '0', '0', '\x97', '0', '0', '\x98', '0', '0', '\x99', '0', '0', '\x9a', '0', '0', '\x9b', '0', '0', '\x9c', '0', '0', '\x9d', '0', '0', '\x9e', '0', '0', '\x9f',
+    '0', '0', '\xa0', '0', '0', '\xa1', '0', '0', '\xa2', '0', '0', '\xa3', '0', '0', '\xa4', '0', '0', '\xa5', '0', '0', '\xa6', '0', '0', '\xa7', '0', '0', '\xa8', '0', '0', '\xa9', '0', '0', '\xaa', '0', '0', '\xab', '0', '0', '\xac', '0', '0', '\xad', '0', '0', '\xae', '0', '0', '\xaf',
+    '0', '0', '\xb0', '0', '0', '\xb1', '0', '0', '\xb2', '0', '0', '\xb3', '0', '0', '\xb4', '0', '0', '\xb5', '0', '0', '\xb6', '0', '0', '\xb7', '0', '0', '\xb8', '0', '0', '\xb9', '0', '0', '\xba', '0', '0', '\xbb', '0', '0', '\xbc', '0', '0', '\xbd', '0', '0', '\xbe', '0', '0', '\xbf',
+    '0', '0', '\xc0', '0', '0', '\xc1', '0', '0', '\xc2', '0', '0', '\xc3', '0', '0', '\xc4', '0', '0', '\xc5', '0', '0', '\xc6', '0', '0', '\xc7', '0', '0', '\xc8', '0', '0', '\xc9', '0', '0', '\xca', '0', '0', '\xcb', '0', '0', '\xcc', '0', '0', '\xcd', '0', '0', '\xce', '0', '0', '\xcf',
+    '0', '0', '\xd0', '0', '0', '\xd1', '0', '0', '\xd2', '0', '0', '\xd3', '0', '0', '\xd4', '0', '0', '\xd5', '0', '0', '\xd6', '0', '0', '\xd7', '0', '0', '\xd8', '0', '0', '\xd9', '0', '0', '\xda', '0', '0', '\xdb', '0', '0', '\xdc', '0', '0', '\xdd', '0', '0', '\xde', '0', '0', '\xdf',
+    '0', '0', '\xe0', '0', '0', '\xe1', '0', '0', '\xe2', '0', '0', '\xe3', '0', '0', '\xe4', '0', '0', '\xe5', '0', '0', '\xe6', '0', '0', '\xe7', '0', '0', '\xe8', '0', '0', '\xe9', '0', '0', '\xea', '0', '0', '\xeb', '0', '0', '\xec', '0', '0', '\xed', '0', '0', '\xee', '0', '0', '\xef',
+    '0', '0', '\xf0', '0', '0', '\xf1', '0', '0', '\xf2', '0', '0', '\xf3', '0', '0', '\xf4', '0', '0', '\xf5', '0', '0', '\xf6', '0', '0', '\xf7', '0', '0', '\xf8', '0', '0', '\xf9', '0', '0', '\xfa', '0', '0', '\xfb', '0', '0', '\xfc', '0', '0', '\xfd', '0', '0', '\xfe', '0', '0', '\xff',
+};
+
+const std::string empty_string;
+
 namespace
 {
 // "[\dA-Za-z!"#$%&'()*+,-./:;<=>?{}_^`~\[\]\\]{1}"
@@ -93,11 +114,16 @@ bool is_whitespace(const char* p)
 
 namespace marc
 {
+std::string_view to_string(indicator_type t)
+{
+    return {ascii_character_strings + t, 1 };
+}
+
 void MarcBase::set_attribute(const char* name, const char* content)
 {
     if (std::strcmp(name, id_tag) == 0)
     {
-        id_ = content;
+        id_ = Identifier(content);
     }
     else
         set_attribute_(name, content);
@@ -166,14 +192,14 @@ void DataField::set_attribute_(const char* name, const char* content)
     else if (std::strcmp(name, ind1_tag) == 0)
     {
         if (allowed_indicator_character(content[0]) && content[1] == '\0')
-            ind1_ = content[0];
+            ind1_ = static_cast< indicator_type >(content[0]);
         else
             throw std::runtime_error("Illegal value for ind1");
     }
     else if (std::strcmp(name, ind2_tag) == 0)
     {
         if (allowed_indicator_character(content[0]) && content[1] == '\0')
-            ind2_ = content[0];
+            ind2_ = static_cast< indicator_type >(content[0]);
         else
             throw std::runtime_error("Illegal value for ind1");
     }
@@ -200,14 +226,14 @@ std::string_view DataField::get_tag() const
     return { tag_, 3 };
 }
 
-std::string_view DataField::get_indicator1() const
+indicator_type DataField::get_indicator1() const
 {
-    return {ascii_character_strings + static_cast< unsigned char >(ind1_), 1 };
+    return ind1_;
 }
 
-std::string_view DataField::get_indicator2() const
+indicator_type DataField::get_indicator2() const
 {
-    return {ascii_character_strings + static_cast< unsigned char >(ind2_), 1 };
+    return ind2_;
 }
 
 classification_type ControlField::classify() const
@@ -233,9 +259,9 @@ void ControlField::add_text(const char * content)
     content_ += content;
 }
 
-std::string ControlField::get_tag() const
+std::string_view ControlField::get_tag() const
 {
-    return std::string("00") + tag_;
+    return { zero_zero_strings + 3 * tag_, 3 };
 }
 
 const std::string& ControlField::get_content() const
@@ -258,7 +284,7 @@ void Leader::add_text(const char * content)
     content_ += content;
 }
 
-std::string Leader::get_content() const
+const std::string& Leader::get_content() const
 {
     return content_;
 }
@@ -303,11 +329,11 @@ void Record::append(DataField &&f)
     datafields.push_back(std::move(f));
 }
 
-std::string Record::label() const
+const std::string& Record::label() const
 {
     if (!leaders.empty())
         return leaders[0].get_content();
-    return std::string();
+    return empty_string;
 }
 
 std::size_t Record::num_leaders() const
@@ -360,14 +386,21 @@ std::size_t Collection::size() const
     return records.size();
 }
 
-std::string Collection::label(std::size_t i) const
+const std::string& Collection::label(std::size_t i) const
 {
-    return i < records.size() ? records[i].label() : std::string();
+    if (i < records.size())
+        return records[i].label();
+    return empty_string;
 }
 
-Record Collection::record(std::size_t i) const
+const Record& Collection::record(std::size_t i) const
 {
-    return i < records.size() ? records[i] : Record();
+    return records.at(i);
+}
+
+Identifier::Identifier(std::string s) : id_(std::move(s))
+{
+
 }
 
 }
