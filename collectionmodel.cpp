@@ -12,6 +12,8 @@ QVariant CollectionModel::headerData(int section, Qt::Orientation orientation, i
         switch (section)
         {
         case 0:
+            return "Num";
+        case 1:
             return "Record";
         }
     }
@@ -41,7 +43,7 @@ int CollectionModel::rowCount(const QModelIndex &parent) const
 int CollectionModel::columnCount(const QModelIndex &parent) const
 {
     if (!parent.isValid())
-        return 1;
+        return 2;
 
     return 0;
 }
@@ -53,6 +55,8 @@ QVariant CollectionModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
         {
             if (index.column() == 0)
+                return index.row();
+            if (index.column() == 1)
                 return QString::fromStdString(db->label(0, index.row()));
         }
     }

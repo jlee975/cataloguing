@@ -20,15 +20,6 @@ std::uint64_t le64(const char* buf)
     return x;
 }
 
-void write(std::ostream& os, const std::string_view& s)
-{
-    char buf[8];
-    const std::size_t n = s.length();
-    le64(buf, n);
-    os.write(buf, 8);
-    os.write(s.data(), n);
-}
-
 std::string read(const MemoryMappedFile& map, std::size_t& off)
 {
     const char* q = map.data();
@@ -43,62 +34,65 @@ std::string read(const MemoryMappedFile& map, std::size_t& off)
 
 namespace marc
 {
-void Database::insert(Collection c)
+class DatabaseFileWriter
 {
-    const std::string s = file.get_path();
-
-    std::ofstream out(s);
-
-    // unmap
-    file.close();
-
-    // append c to file
-    char buf[8];
-
-    out.write("c", 1);
-    const auto startc = out.tellp();
-    out.write(buf, 8); // reserve 8 bytes for the size of the collection
-
-    for (std::size_t ir = 0, nr = c.size(); ir < nr; ++ir)
+public:
+    explicit DatabaseFileWriter(const std::string& path) : out(path)
     {
+        out.seekp(0, std::ios_base::end);
+    }
+
+    void write(const std::vector< Collection >& collections)
+    {
+        for (const auto& c : collections)
+        {
+            write(c);
+        }
+    }
+
+    void write(const Collection& c)
+    {
+        char buf[8];
+
+        out.write("c", 1);
+        const auto startc = out.tellp();
+        out.write(buf, 8); // reserve 8 bytes for the size of the collection
+
+        for (std::size_t ir = 0, nr = c.size(); ir < nr; ++ir)
+        {
+            write(c.record(ir));
+        }
+
+        const auto endc = out.tellp();
+        le64(buf, endc - startc);
+        out.seekp(startc);
+        out.write(buf, 8);
+        out.seekp(endc);
+    }
+
+    void write(const Record& r)
+    {
+        char buf[8];
+
         out.write("r", 1);
         const auto startr = out.tellp();
         out.write(buf, 8);
 
-        const Record& r = c.record(ir);
 
         // Write Leaders
         for (std::size_t il = 0, nl = r.num_leaders(); il < nl; ++il)
         {
-            out.write("l",1);
-            const Leader& l = r.get_leader(il);
-            write(out, l.get_content());
+            write(r.get_leader(il));
         }
 
         for (std::size_t ic = 0, nc = r.num_controlfields(); ic < nc; ++ic)
         {
-            out.write("f", 1);
-            const ControlField& cf = r.get_controlfield(ic);
-
-            write(out, cf.get_tag().to_string());
-            write(out, cf.get_content());
+            write(r.get_controlfield(ic));
         }
 
         for (std::size_t id = 0, nd = r.num_datafields(); id < nd; ++id)
         {
-            out.write("d", 1);
-            const DataField& df = r.get_datafield(id);
-            write(out, df.get_tag().to_string());
-            write(out, to_string(df.get_indicator1()));
-            write(out, to_string(df.get_indicator2()));
-
-            for (std::size_t is = 0, ns = df.num_subfields(); is < ns; ++is)
-            {
-                out.write("s", 1);
-                const SubField& sf = df.get_subfield(is);
-                write(out, to_string(sf.get_code()));
-                write(out, sf.get_content());
-            }
+            write(r.get_datafield(id));
         }
 
         const auto endr = out.tellp();
@@ -108,14 +102,68 @@ void Database::insert(Collection c)
         out.seekp(endr);
     }
 
-    const auto endc = out.tellp();
-    le64(buf, endc - startc);
-    out.seekp(startc);
-    out.write(buf, 8);
-    out.seekp(endc);
+    void write(const Leader& l)
+    {
+        out.write("l",1);
+        write(l.get_content());
+    }
+
+    void write(const ControlField& cf)
+    {
+        out.write("f", 1);
+
+        write(cf.get_tag().to_string());
+        write(cf.get_content());
+    }
+
+    void write(const DataField& df)
+    {
+        out.write("d", 1);
+        write(df.get_tag().to_string());
+        write(to_string(df.get_indicator1()));
+        write(to_string(df.get_indicator2()));
+
+        for (std::size_t is = 0, ns = df.num_subfields(); is < ns; ++is)
+        {
+            write(df.get_subfield(is));
+        }
+    }
+
+    void write(const SubField& sf)
+    {
+        out.write("s", 1);
+        write(to_string(sf.get_code()));
+        write(sf.get_content());
+    }
+
+    void write(const std::string_view& s)
+    {
+        char buf[8];
+        const std::size_t n = s.length();
+        le64(buf, n);
+        out.write(buf, 8);
+        out.write(s.data(), n);
+    }
+
+private:
+    std::ofstream out;
+};
+
+void Database::insert(Collection c)
+{
+    const std::string s = file.get_path();
+
+    {
+        DatabaseFileWriter w(s);
+
+        // unmap
+        file.close();
+
+        w.write(c);
+    }
 
     // remap
-    file.open(s);
+    load(s);
 }
 
 std::size_t Database::size(std::size_t i) const
@@ -196,78 +244,10 @@ Record Database::load_record(std::size_t off) const
     return rec;
 }
 
-void Database::save(const std::string & path) const
+void Database::save(const std::string & path, const std::vector< Collection >& collections)
 {
-    /*
-    std::ofstream out(path);
-
-    if (!out.is_open())
-        return;
-
-    char buf[8];
-
-    for (const auto& c : collections)
-    {
-        out.write("c", 1);
-        const auto startc = out.tellp();
-        out.write(buf, 8); // reserve 8 bytes for the size of the collection
-
-        for (std::size_t ir = 0, nr = c.size(); ir < nr; ++ir)
-        {
-            out.write("r", 1);
-            const auto startr = out.tellp();
-            out.write(buf, 8);
-
-            const Record& r = c.record(ir);
-
-            // Write Leaders
-            for (std::size_t il = 0, nl = r.num_leaders(); il < nl; ++il)
-            {
-                out.write("l",1);
-                const Leader& l = r.get_leader(il);
-                write(out, l.get_content());
-            }
-
-            for (std::size_t ic = 0, nc = r.num_controlfields(); ic < nc; ++ic)
-            {
-                out.write("f", 1);
-                const ControlField& cf = r.get_controlfield(ic);
-
-                write(out, cf.get_tag().to_string());
-                write(out, cf.get_content());
-            }
-
-            for (std::size_t id = 0, nd = r.num_datafields(); id < nd; ++id)
-            {
-                out.write("d", 1);
-                const DataField& df = r.get_datafield(id);
-                write(out, df.get_tag().to_string());
-                write(out, to_string(df.get_indicator1()));
-                write(out, to_string(df.get_indicator2()));
-
-                for (std::size_t is = 0, ns = df.num_subfields(); is < ns; ++is)
-                {
-                    out.write("s", 1);
-                    const SubField& sf = df.get_subfield(is);
-                    write(out, to_string(sf.get_code()));
-                    write(out, sf.get_content());
-                }
-            }
-
-            const auto endr = out.tellp();
-            le64(buf, endr - startr);
-            out.seekp(startr);
-            out.write(buf, 8);
-            out.seekp(endr);
-        }
-
-        const auto endc = out.tellp();
-        le64(buf, endc - startc);
-        out.seekp(startc);
-        out.write(buf, 8);
-        out.seekp(endc);
-    }
-    */
+    DatabaseFileWriter w(path);
+    w.write(collections);
 }
 
 void Database::load(const std::string & path)

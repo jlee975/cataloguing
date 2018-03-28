@@ -9,6 +9,13 @@
 
 namespace marc
 {
+/** @brief The Database class
+ *
+ * @todo Separate index file that maps to one or more data files. So we don't have to walk the whole data set.
+ * @todo Compressed fields
+ * @todo Don't store string length for short strings.
+ * @todo Store fields in sorted order
+ */
 class Database
 {
 public:
@@ -21,12 +28,16 @@ public:
     std::size_t size(std::size_t) const;
     std::string label(std::size_t, std::size_t) const;
     Record get_record(std::size_t, std::size_t) const;
-    void save(const std::string&) const;
     void load(const std::string&);
 private:
+    static void save(const std::string&, const std::vector< Collection >&);
     std::string load_leader(std::size_t) const;
     Record load_record(std::size_t) const;
+
+    /// The database file
     MemoryMappedFile file;
+
+    /// Offsets of records in the database, grouped by collection
     std::vector< std::vector< std::size_t > > colls;
 };
 }

@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     collection_model = new CollectionModel(this);
     record_model = new RecordModel(this);
-    ui->listView->setModel(collection_model);
-    ui->treeView->setModel(record_model);
+    ui->dbview->setModel(collection_model);
+    ui->recordview->setModel(record_model);
 }
 
 MainWindow::~MainWindow()
@@ -22,11 +22,6 @@ MainWindow::~MainWindow()
     delete record_model;
     delete collection_model;
     delete ui;
-}
-
-void MainWindow::on_listView_activated(const QModelIndex &index)
-{
-    record_model->reset(database.get_record(0, index.row()));
 }
 
 void MainWindow::on_actionImport_triggered()
@@ -43,7 +38,7 @@ void MainWindow::on_actionImport_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-    database.save("/home/jonathan/marc");
+//    database.save("/home/jonathan/marc");
 }
 
 void MainWindow::on_actionLoad_triggered()
@@ -52,4 +47,9 @@ void MainWindow::on_actionLoad_triggered()
     collection_model->clear();
     database.load("/home/jonathan/marc");
     collection_model->reset(&database);
+}
+
+void MainWindow::on_dbview_activated(const QModelIndex &index)
+{
+    record_model->reset(database.get_record(0, index.row()));
 }

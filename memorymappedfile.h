@@ -22,7 +22,6 @@ public:
     std::size_t size() const;
 private:
     std::string path;
-    int fd;
     std::size_t size_;
     void* mapping;
 };

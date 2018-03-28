@@ -8,12 +8,12 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-MemoryMappedFile::MemoryMappedFile() : fd(-1), mapping(nullptr)
+MemoryMappedFile::MemoryMappedFile() : mapping(nullptr)
 {
 }
 
 MemoryMappedFile::MemoryMappedFile(const std::string & path_)
-    : fd(-1), size_(0), mapping(nullptr)
+    : size_(0), mapping(nullptr)
 {
     const int fd_ = ::open(path_.c_str(), O_RDONLY);
 
@@ -27,17 +27,14 @@ MemoryMappedFile::MemoryMappedFile(const std::string & path_)
                 path = path_;
                 mapping = p;
                 size_ = buf.st_size;
-                fd = fd_;
-                return;
             }
         }
         ::close(fd_);
     }
 }
 
-MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : path(std::move(o.path)), fd(o.fd), size_(o.size_), mapping(o.mapping)
+MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : path(std::move(o.path)), size_(o.size_), mapping(o.mapping)
 {
-    o.fd = -1;
     o.size_ = 0;
     o.mapping = nullptr;
 }
@@ -46,7 +43,6 @@ MemoryMappedFile::~MemoryMappedFile()
 {
     if (mapping)
         ::munmap(mapping, size_);
-    ::close(fd);
 }
 
 MemoryMappedFile & MemoryMappedFile::operator=(MemoryMappedFile && o)
@@ -59,7 +55,6 @@ MemoryMappedFile & MemoryMappedFile::operator=(MemoryMappedFile && o)
 void MemoryMappedFile::swap(MemoryMappedFile & o)
 {
     path.swap(o.path);
-    std::swap(fd, o.fd);
     std::swap(size_, o.size_);
     std::swap(mapping, o.mapping);
 }

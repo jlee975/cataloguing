@@ -22,13 +22,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_listView_activated(const QModelIndex &index);
-
     void on_actionImport_triggered();
 
     void on_actionSave_triggered();
 
     void on_actionLoad_triggered();
+
+    void on_dbview_activated(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
