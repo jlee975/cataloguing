@@ -21,6 +21,8 @@ public:
     std::size_t size(std::size_t) const;
     std::string label(std::size_t, std::size_t) const;
     Record get_record(std::size_t, std::size_t) const;
+    void save(const std::string&) const;
+    void load(const std::string&);
 private:
     std::vector< Collection > collections;
 };

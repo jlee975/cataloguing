@@ -38,3 +38,16 @@ void MainWindow::on_actionImport_triggered()
         collection_model->reset(&database);
     }
 }
+
+void MainWindow::on_actionSave_triggered()
+{
+    database.save("/home/jonathan/marc");
+}
+
+void MainWindow::on_actionLoad_triggered()
+{
+    record_model->clear();
+    collection_model->clear();
+    database.load("/home/jonathan/marc");
+    collection_model->reset(&database);
+}

@@ -74,18 +74,19 @@ void RecordModel::reset(const marc::Record & r_)
 {
     tree< derp > tree2;
 
-    for (std::size_t i = 0; i < r_.num_leaders(); ++i)
+    for (std::size_t i = 0, n = r_.num_leaders(); i < n; ++i)
     {
         tree2.add_root(derp{"Leader", QString::fromStdString(r_.get_leader(i).get_content())});
     }
 
-    for (std::size_t i = 0; i < r_.num_controlfields(); ++i)
+    for (std::size_t i = 0, n = r_.num_controlfields(); i < n; ++i)
     {
-        const std::string_view& s = r_.get_controlfield(i).get_tag().to_string();
-        tree2.add_root(derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(r_.get_controlfield(i).get_content())});
+        const auto& c = r_.get_controlfield(i);
+        const std::string_view& s = c.get_tag().to_string();
+        tree2.add_root(derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(c.get_content())});
     }
 
-    for (std::size_t i = 0; i < r_.num_datafields(); ++i)
+    for (std::size_t i = 0, n = r_.num_datafields(); i < n; ++i)
     {
         const marc::DataField& f = r_.get_datafield(i);
         const std::string_view& t = f.get_tag().to_string();
@@ -95,10 +96,11 @@ void RecordModel::reset(const marc::Record & r_)
         const std::size_t j = tree2.add_root(derp{QString::fromLatin1(t.data(), t.length()), "Data Field Description"});
         tree2.add_child(j, derp{"ind1", QString::fromLatin1(ind1.data(), ind1.length())});
         tree2.add_child(j, derp{"ind2", QString::fromLatin1(ind2.data(), ind2.length())});
-        for (std::size_t k = 0; k < r_.get_datafield(i).num_subfields(); ++k)
+        for (std::size_t k = 0, m = f.num_subfields(); k < m; ++k)
         {
-            const std::string_view& s = to_string(f.get_subfield(k).get_code());
-            tree2.add_child(j, derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(f.get_subfield(k).get_content())});
+            const auto& sf = f.get_subfield(k);
+            const std::string_view& s = to_string(sf.get_code());
+            tree2.add_child(j, derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(sf.get_content())});
         }
     }
 

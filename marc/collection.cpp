@@ -154,9 +154,19 @@ subfield_code SubField::get_code() const
     return code_;
 }
 
+void SubField::set_code(const std::string & s)
+{
+    code_ = static_cast< subfield_code >(s.at(0));
+}
+
 const std::string& SubField::get_content() const
 {
     return content_;
+}
+
+void SubField::set_content(std::string && s)
+{
+    content_ = std::move(s);
 }
 
 classification_type DataField::classify() const
@@ -207,9 +217,29 @@ const Tag& DataField::get_tag() const
     return tag_;
 }
 
+void DataField::set_tag(const std::string & s)
+{
+    tag_ = Tag(s.data());
+}
+
 indicator_type DataField::get_indicator1() const
 {
     return ind1_;
+}
+
+void DataField::set_indicator1(const std::string & s)
+{
+    ind1_ = static_cast< indicator_type >(s.at(0));
+}
+
+void DataField::set_indicator2(const std::string & s)
+{
+    ind2_ = static_cast< indicator_type >(s.at(0));
+}
+
+void DataField::insert(SubField && f)
+{
+    subfields_.push_back(std::move(f));
 }
 
 indicator_type DataField::get_indicator2() const
@@ -245,9 +275,19 @@ const Tag& ControlField::get_tag() const
     return tag_;
 }
 
+void ControlField::set_tag(const std::string & s)
+{
+    tag_ = Tag(s.data());
+}
+
 const std::string& ControlField::get_content() const
 {
     return content_;
+}
+
+void ControlField::set_content(std::string && s)
+{
+    content_ = std::move(s);
 }
 
 classification_type Leader::classify() const
@@ -268,6 +308,11 @@ void Leader::add_text(const char * content)
 const std::string& Leader::get_content() const
 {
     return content_;
+}
+
+void Leader::set_content(std::string && s)
+{
+    content_ = std::move(s);
 }
 
 classification_type Record::classify() const
@@ -342,6 +387,21 @@ const DataField &Record::get_datafield(std::size_t i) const
     return datafields.at(i);
 }
 
+void Record::insert(Leader &&l)
+{
+    leaders.push_back(std::move(l));
+}
+
+void Record::insert(ControlField && f)
+{
+    controlfields.push_back(std::move(f));
+}
+
+void Record::insert(DataField && f)
+{
+    datafields.push_back(std::move(f));
+}
+
 std::size_t Record::num_datafields() const
 {
     return datafields.size();
@@ -377,6 +437,11 @@ const std::string& Collection::label(std::size_t i) const
 const Record& Collection::record(std::size_t i) const
 {
     return records.at(i);
+}
+
+void Collection::insert(Record && r)
+{
+    records.push_back(std::move(r));
 }
 
 Identifier::Identifier(std::string s) : id_(std::move(s))

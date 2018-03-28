@@ -58,7 +58,9 @@ public:
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     subfield_code get_code() const;
+    void set_code(const std::string&);
     const std::string& get_content() const;
+    void set_content(std::string&&);
 private:
     std::string content_;
     subfield_code code_;
@@ -73,8 +75,12 @@ public:
     std::size_t num_subfields() const;
     const SubField& get_subfield(std::size_t) const;
     const Tag& get_tag() const;
+    void set_tag(const std::string&);
     indicator_type get_indicator1() const;
+    void set_indicator1(const std::string&);
     indicator_type get_indicator2() const;
+    void set_indicator2(const std::string&);
+    void insert(SubField&&);
 private:
     std::vector< SubField > subfields_;
 
@@ -97,7 +103,9 @@ public:
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     const Tag& get_tag() const;
+    void set_tag(const std::string&);
     const std::string& get_content() const;
+    void set_content(std::string&&);
 private:
     Tag tag_;
 
@@ -111,6 +119,7 @@ public:
     void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     const std::string& get_content() const;
+    void set_content(std::string&&);
 private:
     /// @todo "[\d ]{5}[\dA-Za-z ]{1}[\dA-Za-z]{1}[\dA-Za-z ]{3}(2| )(2| )[\d ]{5}[\dA-Za-z ]{3}(4500|    )"
     /// Each block of bytes has meaning. Could easily chop a few bytes
@@ -148,9 +157,14 @@ public:
     const ControlField& get_controlfield(std::size_t) const;
     std::size_t num_datafields() const;
     const DataField& get_datafield(std::size_t) const;
+    void insert(Leader&&);
+    void insert(ControlField&&);
+    void insert(DataField&&);
 private:
     enum type_type { unspecified, bibliographic, authority, holdings, classification, community };
     type_type type_;
+
+    /// @todo Pretty sure can only have one Leader
     std::vector< Leader > leaders;
     std::vector< ControlField > controlfields;
     std::vector< DataField > datafields;
@@ -165,6 +179,7 @@ public:
     std::size_t size() const;
     const std::string& label(std::size_t) const;
     const Record& record(std::size_t) const;
+    void insert(Record&&);
 private:
     std::vector< Record > records;
 };
