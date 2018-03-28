@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QAbstractItemModel>
 
-#include "marc/database.h"
+#include "database.h"
 
 #include "collectionmodel.h"
 #include "recordmodel.h"

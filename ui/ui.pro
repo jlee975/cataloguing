@@ -27,22 +27,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     collectionmodel.cpp \
-    recordmodel.cpp \
-    memorymappedfile.cpp
+    recordmodel.cpp
 
 HEADERS += \
         mainwindow.h \
     collectionmodel.h \
     recordmodel.h \
-    tree.h \
-    memorymappedfile.h
+    tree.h
 
 FORMS += \
         mainwindow.ui
-
-INCLUDEPATH += /usr/include/libxml2
-
-unix|win32: LIBS += -lxml2
 
 QMAKE_CXXFLAGS = -std=c++17 -pipe
 QMAKE_CXXFLAGS_DEBUG = -O0 -ggdb3
@@ -53,3 +47,16 @@ QMAKE_CXXFLAGS_WARN_ON = -Wall -Wsign-compare -Wpointer-arith -Winit-self \
     -Wcast-qual -Wredundant-decls -Wcast-align -Wwrite-strings \
     -Woverloaded-virtual -Wformat -Wno-unknown-pragmas -Wnon-virtual-dtor \
     -Wshadow
+
+LIBS += -L$$OUT_PWD/../jlee/ -ljlee
+INCLUDEPATH += $$PWD/../jlee
+DEPENDPATH += $$PWD/../jlee
+PRE_TARGETDEPS += $$OUT_PWD/../jlee/libjlee.a
+
+INCLUDEPATH += /usr/include/libxml2
+LIBS += -lxml2
+
+LIBS += -L$$OUT_PWD/../marc/ -lmarc
+INCLUDEPATH += $$PWD/../marc
+DEPENDPATH += $$PWD/../marc
+PRE_TARGETDEPS += $$OUT_PWD/../marc/libmarc.a

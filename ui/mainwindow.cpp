@@ -4,7 +4,7 @@
 #include <QFile>
 #include <QFileDialog>
 
-#include "marc/marcxml.h"
+#include "marcxml.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)

@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 
-#include "marc/database.h"
+#include "database.h"
 
 class CollectionModel : public QAbstractItemModel
 {

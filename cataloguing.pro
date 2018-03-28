@@ -2,6 +2,8 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     marc \
-    ui
+    ui \
+    jlee
 
+marc.depends = jlee
 ui.depends = marc

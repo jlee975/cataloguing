@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 
-#include "marc/collection.h"
+#include "collection.h"
 
 #include "tree.h"
 
