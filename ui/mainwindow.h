@@ -31,6 +31,8 @@ private slots:
     void on_dbview_activated(const QModelIndex &index);
 
 private:
+    void load_database();
+
     Ui::MainWindow *ui;
     marc::Database database;
     CollectionModel* collection_model;

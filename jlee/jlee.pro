@@ -10,10 +10,11 @@ CONFIG += staticlib
 CONFIG -= qt c++11 c++14
 
 SOURCES += \
-    memorymappedfile.cpp
+    fileutil/memorymappedfile.cpp
 
 HEADERS += \
-    memorymappedfile.h
+    tree/tree.h \
+    fileutil/memorymappedfile.h
 
 QMAKE_CXXFLAGS = -std=c++17 -pipe
 QMAKE_CXXFLAGS_DEBUG = -O0 -ggdb3

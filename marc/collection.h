@@ -103,9 +103,8 @@ public:
     const std::string& get_content() const;
     void set_content(std::string);
 private:
-    Tag tag_;
-
     std::string content_;
+    Tag tag_;
 };
 
 class Leader : public MarcBase

@@ -5,7 +5,7 @@
 
 #include "collection.h"
 
-#include "tree.h"
+#include "tree/tree.h"
 
 class RecordModel : public QAbstractItemModel
 {

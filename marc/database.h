@@ -4,8 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "fileutil/memorymappedfile.h"
+
 #include "collection.h"
-#include "memorymappedfile.h"
 
 namespace marc
 {

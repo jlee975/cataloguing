@@ -32,8 +32,7 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     collectionmodel.h \
-    recordmodel.h \
-    tree.h
+    recordmodel.h
 
 FORMS += \
         mainwindow.ui

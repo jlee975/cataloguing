@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     record_model = new RecordModel(this);
     ui->dbview->setModel(collection_model);
     ui->recordview->setModel(record_model);
+
+    load_database();
 }
 
 MainWindow::~MainWindow()
@@ -42,6 +44,11 @@ void MainWindow::on_actionSave_triggered()
 }
 
 void MainWindow::on_actionLoad_triggered()
+{
+    load_database();
+}
+
+void MainWindow::load_database()
 {
     record_model->clear();
     collection_model->clear();
