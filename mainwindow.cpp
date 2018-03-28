@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QFileDialog>
 
+#include "marc/marcxml.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -34,7 +36,7 @@ void MainWindow::on_actionImport_triggered()
     {
         record_model->clear();
         collection_model->clear();
-        database.import_xml("/home/jonathan/nas/catalog/BooksAll.2014.part01.xml");
+        database.insert(marc::load_xml("/home/jonathan/nas/catalog/BooksAll.2014.part01.xml"));
         collection_model->reset(&database);
     }
 }

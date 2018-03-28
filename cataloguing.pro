@@ -29,7 +29,8 @@ SOURCES += \
     marc/collection.cpp \
     marc/database.cpp \
     collectionmodel.cpp \
-    recordmodel.cpp
+    recordmodel.cpp \
+    marc/marcxml.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS += \
     marc/database.h \
     collectionmodel.h \
     recordmodel.h \
-    tree.h
+    tree.h \
+    marc/marcxml.h
 
 FORMS += \
         mainwindow.ui
