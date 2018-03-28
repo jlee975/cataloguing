@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-03-22T21:28:18
+# Project created by QtCreator 2018-03-28T10:54:53
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = cataloguing
+TARGET = ui
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -26,21 +26,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    marc/collection.cpp \
-    marc/database.cpp \
     collectionmodel.cpp \
     recordmodel.cpp \
-    marc/marcxml.cpp \
     memorymappedfile.cpp
 
 HEADERS += \
         mainwindow.h \
-    marc/collection.h \
-    marc/database.h \
     collectionmodel.h \
     recordmodel.h \
     tree.h \
-    marc/marcxml.h \
     memorymappedfile.h
 
 FORMS += \
