@@ -7,7 +7,8 @@
 
 namespace marc
 {
-enum classification_type { invalid, collection, record, leader, controlfield, datafield, subfield };
+enum classification_type { invalid_classification, collection, record, leader, controlfield, datafield, subfield };
+enum record_type { invalid_record, bibliographic, authority, holdings, classification, community };
 enum class indicator_type : unsigned char { first = 32, last = 122 };
 enum class subfield_code : unsigned char { first = 33, last = 126 };
 
@@ -42,10 +43,9 @@ public:
     virtual ~MarcBase() = default;
     virtual classification_type classify() const = 0;
     /// @todo Take string_views
-    void set_attribute(const char*, const char*);
+    void set_id(std::string);
     virtual void add_text(const char*);
 private:
-    virtual void set_attribute_(const char*, const char*) = 0;
 
     Identifier id_;
 };
@@ -55,10 +55,9 @@ class SubField : public MarcBase
 public:
     SubField();
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     subfield_code get_code() const;
-    void set_code(const std::string&);
+    void set_code(subfield_code);
     const std::string& get_content() const;
     void set_content(std::string);
 private:
@@ -70,16 +69,15 @@ class DataField : public MarcBase
 {
 public:
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void append(SubField);
     std::size_t num_subfields() const;
     const SubField& get_subfield(std::size_t) const;
     const Tag& get_tag() const;
     void set_tag(Tag);
     indicator_type get_indicator1() const;
-    void set_indicator1(const std::string&);
+    void set_indicator1(indicator_type);
     indicator_type get_indicator2() const;
-    void set_indicator2(const std::string&);
+    void set_indicator2(indicator_type);
 private:
     std::vector< SubField > subfields_;
 
@@ -99,7 +97,6 @@ class ControlField : public MarcBase
 {
 public:
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     const Tag& get_tag() const;
     void set_tag(Tag);
@@ -115,7 +112,6 @@ class Leader : public MarcBase
 {
 public:
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void add_text(const char*) final;
     const std::string& get_content() const;
     void set_content(std::string);
@@ -144,11 +140,12 @@ private:
 class Record : public MarcBase
 {
 public:
+    Record();
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void append(Leader);
     void append(ControlField);
     void append(DataField);
+    void set_type(record_type);
     std::size_t num_leaders() const;
     const Leader& get_leader(std::size_t) const;
     std::size_t num_controlfields() const;
@@ -156,8 +153,7 @@ public:
     std::size_t num_datafields() const;
     const DataField& get_datafield(std::size_t) const;
 private:
-    enum type_type { unspecified, bibliographic, authority, holdings, classification, community };
-    type_type type_;
+    record_type type_;
 
     /// @todo Pretty sure can only have one Leader
     std::vector< Leader > leaders;
@@ -169,7 +165,6 @@ class Collection : public MarcBase
 {
 public:
     classification_type classify() const final;
-    void set_attribute_(const char*, const char*) final;
     void append(Record);
     std::size_t size() const;
     const Record& record(std::size_t) const;

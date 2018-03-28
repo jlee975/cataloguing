@@ -35,17 +35,6 @@ const std::string empty_string;
 
 namespace
 {
-// "[\dA-Za-z!"#$%&'()*+,-./:;<=>?{}_^`~\[\]\\]{1}"
-bool allowed_code_character(char c)
-{
-    return (33 <= c && c <= 63) || (65 <= c && c <= 123) || (125 <= c && c <= 126);
-}
-
-bool allowed_indicator_character(char c)
-{
-    return c == 32 || (48 <= c && c <= 57) || (97 <= c && c <= 122);
-}
-
 bool is_digit_or_major(char c)
 {
     return (48 <= c && c <= 57) || (65 <= c && c <= 90);
@@ -54,11 +43,6 @@ bool is_digit_or_major(char c)
 bool is_digit_or_minor(char c)
 {
     return (48 <= c && c <= 57) || (97 <= c && c <= 122);
-}
-
-bool is_digit_or_letter(char c)
-{
-    return (48 <= c && c <= 57) || (65 <= c && c <= 90) || (97 <= c && c <= 122);
 }
 
 bool is_tag_string(const std::string& s)
@@ -109,14 +93,9 @@ std::string_view to_string(subfield_code c)
     return {ascii_character_strings + static_cast< unsigned char >(c), 1 };
 }
 
-void MarcBase::set_attribute(const char* name, const char* content)
+void MarcBase::set_id(std::string s)
 {
-    if (std::strcmp(name, id_tag) == 0)
-    {
-        id_ = Identifier(content);
-    }
-    else
-        set_attribute_(name, content);
+    id_ = Identifier(std::move(s));
 }
 
 void MarcBase::add_text(const char * content)
@@ -124,7 +103,6 @@ void MarcBase::add_text(const char * content)
     if (!is_whitespace(content))
         throw std::runtime_error("Unexpected text");
 }
-
 
 SubField::SubField() : code_()
 {
@@ -134,18 +112,6 @@ SubField::SubField() : code_()
 classification_type SubField::classify() const
 {
     return subfield;
-}
-
-void SubField::set_attribute_(const char* name, const char* content)
-{
-    if (std::strcmp(name, code_tag) == 0)
-    {
-        if (allowed_code_character(content[0]) && content[1] == '\0')
-            code_ = static_cast< subfield_code >(content[0]);
-        else
-            throw std::runtime_error("Unrecognized subfield code");
-    }
-    else throw std::runtime_error("Unknown subfield attribute");
 }
 
 void SubField::add_text(const char * content)
@@ -158,9 +124,9 @@ subfield_code SubField::get_code() const
     return code_;
 }
 
-void SubField::set_code(const std::string & s)
+void SubField::set_code(subfield_code c)
 {
-    code_ = static_cast< subfield_code >(s.at(0));
+    code_ = c;
 }
 
 const std::string& SubField::get_content() const
@@ -176,29 +142,6 @@ void SubField::set_content(std::string s)
 classification_type DataField::classify() const
 {
     return datafield;
-}
-
-void DataField::set_attribute_(const char* name, const char* content)
-{
-    if (std::strcmp(name, tag_tag) == 0)
-    {
-        tag_ = Tag(content);
-    }
-    else if (std::strcmp(name, ind1_tag) == 0)
-    {
-        if (allowed_indicator_character(content[0]) && content[1] == '\0')
-            ind1_ = static_cast< indicator_type >(content[0]);
-        else
-            throw std::runtime_error("Illegal value for ind1");
-    }
-    else if (std::strcmp(name, ind2_tag) == 0)
-    {
-        if (allowed_indicator_character(content[0]) && content[1] == '\0')
-            ind2_ = static_cast< indicator_type >(content[0]);
-        else
-            throw std::runtime_error("Illegal value for ind1");
-    }
-    else throw std::runtime_error("Unrecognized datafield attribute");
 }
 
 void DataField::append(SubField f)
@@ -231,14 +174,14 @@ indicator_type DataField::get_indicator1() const
     return ind1_;
 }
 
-void DataField::set_indicator1(const std::string & s)
+void DataField::set_indicator1(indicator_type t)
 {
-    ind1_ = static_cast< indicator_type >(s.at(0));
+    ind1_ = t;
 }
 
-void DataField::set_indicator2(const std::string & s)
+void DataField::set_indicator2(indicator_type t)
 {
-    ind2_ = static_cast< indicator_type >(s.at(0));
+    ind2_ = t;
 }
 
 indicator_type DataField::get_indicator2() const
@@ -249,19 +192,6 @@ indicator_type DataField::get_indicator2() const
 classification_type ControlField::classify() const
 {
     return controlfield;
-}
-
-void ControlField::set_attribute_(const char* name, const char* content)
-{
-    if (std::strcmp(name, tag_tag) == 0)
-    {
-        if (content[0] == 48 && content[1] == 48 && is_digit_or_letter(content[2]) && content[3] == '\0')
-        {
-            tag_ = Tag(content);
-        }
-        else throw std::runtime_error("Ill-formed tag");
-    }
-    else throw std::runtime_error("Unrecognized controlfield attribute");
 }
 
 void ControlField::add_text(const char * content)
@@ -294,11 +224,6 @@ classification_type Leader::classify() const
     return leader;
 }
 
-void Leader::set_attribute_(const char*, const char*)
-{
-    throw std::runtime_error("Unrecognized leader attribute");
-}
-
 void Leader::add_text(const char * content)
 {
     content_ += content;
@@ -314,29 +239,14 @@ void Leader::set_content(std::string s)
     content_ = std::move(s);
 }
 
+Record::Record() : type_(invalid_record)
+{
+
+}
+
 classification_type Record::classify() const
 {
     return record;
-}
-
-void Record::set_attribute_(const char* name, const char* content)
-{
-    if (std::strcmp(name, type_tag) == 0)
-    {
-        /// @bug ASCII
-        if (std::strcmp(content, "Bibliographic") == 0)
-            type_ = bibliographic;
-        else if (std::strcmp(content, "Authority") == 0)
-            type_ = authority;
-        else if (std::strcmp(content, "Holdings") == 0)
-            type_ = holdings;
-        else if (std::strcmp(content, "Classification") == 0)
-            type_ = classification;
-        else if (std::strcmp(content, "Community") == 0)
-            type_ = community;
-        else throw std::runtime_error("Unknown record type");
-    }
-    else throw std::runtime_error("Unrecognized record attribute");
 }
 
 void Record::append(Leader l)
@@ -352,6 +262,11 @@ void Record::append(ControlField f)
 void Record::append(DataField f)
 {
     datafields.push_back(std::move(f));
+}
+
+void Record::set_type(record_type t)
+{
+    type_ = t;
 }
 
 std::size_t Record::num_leaders() const
@@ -387,11 +302,6 @@ std::size_t Record::num_datafields() const
 classification_type Collection::classify() const
 {
     return collection;
-}
-
-void Collection::set_attribute_(const char*, const char*)
-{
-    throw std::runtime_error("Unrecognized collection attribute");
 }
 
 void Collection::append(Record r)

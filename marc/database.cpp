@@ -236,14 +236,14 @@ Record Database::load_record(std::size_t off) const
         DataField d;
 
         d.set_tag(Tag(read(file, off)));
-        d.set_indicator1(read(file, off));
-        d.set_indicator2(read(file, off));
+        d.set_indicator1(static_cast< indicator_type >(read(file, off).at(0)));
+        d.set_indicator2(static_cast< indicator_type >(read(file, off).at(0)));
 
         while (file[off] == 's')
         {
             ++off;
             SubField s;
-            s.set_code(read(file, off));
+            s.set_code(static_cast< subfield_code >(read(file, off).at(0)));
             s.set_content(read(file, off));
             d.append(std::move(s));
         }

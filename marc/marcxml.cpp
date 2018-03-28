@@ -1,6 +1,7 @@
 #include "marcxml.h"
 
 #include <stdexcept>
+#include <cstring>
 
 #include <libxml/parser.h>
 
@@ -12,14 +13,69 @@ const xmlChar controlfield_tag[] = { '\x63','\x6f','\x6e','\x74','\x72','\x6f','
 const xmlChar datafield_tag[] = { '\x64','\x61','\x74','\x61','\x66','\x69','\x65','\x6c','\x64',0};
 const xmlChar subfield_tag[] = { '\x73','\x75','\x62','\x66','\x69','\x65','\x6c','\x64',0};
 
+// enums
+const xmlChar bibliographic_tag[] = {'\x42','\x69','\x62','\x6c','\x69','\x6f','\x67','\x72','\x61','\x70','\x68','\x69','\x63',0};
+const xmlChar authority_tag[] = {'\x41','\x75','\x74','\x68','\x6f','\x72','\x69','\x74','\x79',0};
+const xmlChar holdings_tag[] = {'\x48','\x6f','\x6c','\x64','\x69','\x6e','\x67','\x73',0};
+const xmlChar classification_tag[] = {'\x43','\x6c','\x61','\x73','\x73','\x69','\x66','\x69','\x63','\x61','\x74','\x69','\x6f','\x6e',0};
+const xmlChar community_tag[] = {'\x43','\x6f','\x6d','\x6d','\x75','\x6e','\x69','\x74','\x79',0};
+
 // attributes
+const xmlChar id_tag[] = { '\x69', '\x64', 0 };
 const xmlChar tag_tag[] = { '\x74', '\x61', '\x67', 0 };
 const xmlChar ind1_tag[] = { '\x69', '\x6e', '\x64', '\x31', 0 };
 const xmlChar ind2_tag[] = { '\x69', '\x6e', '\x64', '\x32', 0 };
 const xmlChar code_tag[] = { '\x63', '\x6f', '\x64', '\x65', 0 };
+const xmlChar type_tag[] = { '\x74', '\x79', '\x70', '\x65', 0 };
 
 namespace
 {
+bool is_digit_or_letter(xmlChar c)
+{
+    return (48 <= c && c <= 57) || (65 <= c && c <= 90) || (97 <= c && c <= 122);
+}
+
+// "[\dA-Za-z!"#$%&'()*+,-./:;<=>?{}_^`~\[\]\\]{1}"
+bool allowed_code_character(xmlChar c)
+{
+    return (33 <= c && c <= 63) || (65 <= c && c <= 123) || (125 <= c && c <= 126);
+}
+
+bool allowed_indicator_character(xmlChar c)
+{
+    return c == 32 || (48 <= c && c <= 57) || (97 <= c && c <= 122);
+}
+
+marc::record_type to_record_type(const xmlChar* content)
+{
+    if (content)
+    {
+        switch (content[0])
+        {
+        case '\x41':
+            if (std::memcmp(content, authority_tag, 10) == 0)
+                return marc::authority;
+            break;
+        case '\x42':
+            if (std::memcmp(content, bibliographic_tag, 14) == 0)
+                return marc::bibliographic;
+            break;
+        case '\x43':
+            if (std::memcmp(content, classification_tag, 15) == 0)
+                    return marc::classification;
+            if (std::memcmp(content, community_tag, 10) == 0)
+                    return marc::community;
+            break;
+        case '\x48':
+            if (std::memcmp(content, holdings_tag, 9) == 0)
+                    return marc::holdings;
+            break;
+        }
+    }
+
+    return marc::invalid_record;
+}
+
 marc::classification_type classify(const xmlChar* p)
 {
     if (p)
@@ -53,7 +109,7 @@ marc::classification_type classify(const xmlChar* p)
         }
     }
 
-    return marc::invalid;
+    return marc::invalid_classification;
 }
 
 class DFS
@@ -115,7 +171,7 @@ public:
 
                 /// @bug if (xmlChar* == unsigned char)
                 /// @todo There are only so many attributes. Create an enum and pass that instead for the first arg
-                elements.back()->set_attribute(reinterpret_cast< const char* >(a->name), reinterpret_cast< const char* >(value));
+                set_attribute(a->name, value);
                 xmlFree(value);
             }
 
@@ -123,6 +179,67 @@ public:
         default:
             throw std::runtime_error("Expected node");
         }
+    }
+
+    void set_attribute(const xmlChar* name, const xmlChar* value)
+    {
+        if (std::memcmp(name, id_tag, 3) == 0)
+            elements.back()->set_id(reinterpret_cast< const char* >(value));
+        else
+            switch(elements.back()->classify())
+            {
+            case marc::record:
+                if (std::memcmp(name, type_tag, 5) == 0)
+                {
+                    static_cast< marc::Record* >(elements.back())->set_type(to_record_type(value));
+                }
+                else throw std::runtime_error("Unrecognized record attribute");
+                break;
+            case marc::controlfield:
+                if (std::memcmp(name, tag_tag, 4) == 0)
+                {
+                    if (value[0] == 48 && value[1] == 48 && is_digit_or_letter(value[2]) && value[3] == '\0')
+                    {
+                        static_cast< marc::ControlField* >(elements.back())->set_tag(marc::Tag(reinterpret_cast< const char*>(value)));
+                    }
+                    else throw std::runtime_error("Ill-formed tag");
+                }
+                else throw std::runtime_error("Unrecognized controlfield attribute");
+                break;
+            case marc::datafield:
+                if (std::memcmp(name, tag_tag, 4) == 0)
+                {
+                    static_cast< marc::DataField* >(elements.back())->set_tag(marc::Tag(reinterpret_cast< const char* >(value)));
+                }
+                else if (std::memcmp(name, ind1_tag, 5) == 0)
+                {
+                    if (allowed_indicator_character(value[0]) && value[1] == '\0')
+                        static_cast< marc::DataField* >(elements.back())->set_indicator1(static_cast< marc::indicator_type >(value[0]));
+                    else
+                        throw std::runtime_error("Illegal value for ind1");
+                }
+                else if (std::memcmp(name, ind2_tag, 5) == 0)
+                {
+                    if (allowed_indicator_character(value[0]) && value[1] == '\0')
+                        static_cast< marc::DataField* >(elements.back())->set_indicator2(static_cast< marc::indicator_type >(value[0]));
+                    else
+                        throw std::runtime_error("Illegal value for ind1");
+                }
+                else throw std::runtime_error("Unrecognized datafield attribute");
+                break;
+            case marc::subfield:
+                if (std::memcmp(name, code_tag, 5) == 0)
+                {
+                    if (allowed_code_character(value[0]) && value[1] == '\0')
+                        static_cast< marc::SubField* >(elements.back())->set_code(static_cast< marc::subfield_code >(value[0]));
+                    else
+                        throw std::runtime_error("Unrecognized subfield code");
+                }
+                else throw std::runtime_error("Unknown subfield attribute");
+                break;
+            default:
+                throw std::runtime_error("Unrecognized attribute");
+            }
     }
 
     void pop_append()
