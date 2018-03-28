@@ -66,9 +66,6 @@ void MemoryMappedFile::swap(MemoryMappedFile & o)
 
 char MemoryMappedFile::operator[](std::size_t i) const
 {
-    if (i >= size_)
-        throw std::runtime_error("Ugh");
-
     return static_cast< char* >(mapping)[i];
 }
 
