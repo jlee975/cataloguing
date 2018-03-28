@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "collection.h"
+#include "memorymappedfile.h"
 
 namespace marc
 {
@@ -23,7 +24,10 @@ public:
     void save(const std::string&) const;
     void load(const std::string&);
 private:
-    std::vector< Collection > collections;
+    std::string load_leader(std::size_t) const;
+    Record load_record(std::size_t) const;
+    MemoryMappedFile file;
+    std::vector< std::vector< std::size_t > > colls;
 };
 }
 

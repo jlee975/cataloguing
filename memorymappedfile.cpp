@@ -1,5 +1,7 @@
 #include "memorymappedfile.h"
 
+#include <stdexcept>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -10,10 +12,10 @@ MemoryMappedFile::MemoryMappedFile() : fd(-1), mapping(nullptr)
 {
 }
 
-MemoryMappedFile::MemoryMappedFile(const std::string & path)
-    : fd(-1), size(0), mapping(nullptr)
+MemoryMappedFile::MemoryMappedFile(const std::string & path_)
+    : fd(-1), size_(0), mapping(nullptr)
 {
-    const int fd_ = ::open(path.c_str(), O_RDONLY);
+    const int fd_ = ::open(path_.c_str(), O_RDONLY);
 
     if (fd_ != -1)
     {
@@ -22,8 +24,9 @@ MemoryMappedFile::MemoryMappedFile(const std::string & path)
         {
             if (void* p = ::mmap(0, buf.st_size, PROT_READ, MAP_PRIVATE, fd_, 0))
             {
+                path = path_;
                 mapping = p;
-                size = buf.st_size;
+                size_ = buf.st_size;
                 fd = fd_;
                 return;
             }
@@ -32,17 +35,17 @@ MemoryMappedFile::MemoryMappedFile(const std::string & path)
     }
 }
 
-MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : fd(o.fd), size(o.size), mapping(o.mapping)
+MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : path(std::move(o.path)), fd(o.fd), size_(o.size_), mapping(o.mapping)
 {
     o.fd = -1;
-    o.size = 0;
+    o.size_ = 0;
     o.mapping = nullptr;
 }
 
 MemoryMappedFile::~MemoryMappedFile()
 {
     if (mapping)
-        ::munmap(mapping, size);
+        ::munmap(mapping, size_);
     ::close(fd);
 }
 
@@ -55,17 +58,43 @@ MemoryMappedFile & MemoryMappedFile::operator=(MemoryMappedFile && o)
 
 void MemoryMappedFile::swap(MemoryMappedFile & o)
 {
+    path.swap(o.path);
     std::swap(fd, o.fd);
-    std::swap(size, o.size);
+    std::swap(size_, o.size_);
     std::swap(mapping, o.mapping);
 }
 
 char MemoryMappedFile::operator[](std::size_t i) const
 {
+    if (i >= size_)
+        throw std::runtime_error("Ugh");
+
     return static_cast< char* >(mapping)[i];
 }
 
 const char *MemoryMappedFile::data() const
 {
     return static_cast< char* >(mapping);
+}
+
+const std::string &MemoryMappedFile::get_path() const
+{
+    return path;
+}
+
+void MemoryMappedFile::open(const std::string & path_)
+{
+    MemoryMappedFile t(path_);
+    swap(t);
+}
+
+void MemoryMappedFile::close()
+{
+    MemoryMappedFile t;
+    swap(t);
+}
+
+std::size_t MemoryMappedFile::size() const
+{
+    return size_;
 }

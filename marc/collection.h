@@ -149,7 +149,6 @@ public:
     void append(Leader);
     void append(ControlField);
     void append(DataField);
-    const std::string& label() const;
     std::size_t num_leaders() const;
     const Leader& get_leader(std::size_t) const;
     std::size_t num_controlfields() const;
@@ -173,7 +172,6 @@ public:
     void set_attribute_(const char*, const char*) final;
     void append(Record);
     std::size_t size() const;
-    const std::string& label(std::size_t) const;
     const Record& record(std::size_t) const;
 private:
     std::vector< Record > records;

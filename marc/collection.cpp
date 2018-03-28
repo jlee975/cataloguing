@@ -354,13 +354,6 @@ void Record::append(DataField f)
     datafields.push_back(std::move(f));
 }
 
-const std::string& Record::label() const
-{
-    if (!leaders.empty())
-        return leaders[0].get_content();
-    return empty_string;
-}
-
 std::size_t Record::num_leaders() const
 {
     return leaders.size();
@@ -409,13 +402,6 @@ void Collection::append(Record r)
 std::size_t Collection::size() const
 {
     return records.size();
-}
-
-const std::string& Collection::label(std::size_t i) const
-{
-    if (i < records.size())
-        return records[i].label();
-    return empty_string;
 }
 
 const Record& Collection::record(std::size_t i) const
