@@ -3,11 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
+#include "memorymappedfile.h"
 
 namespace
 {
@@ -35,8 +31,9 @@ void write(std::ostream& os, const std::string_view& s)
     os.write(s.data(), n);
 }
 
-std::string read(const char* q, std::size_t& off)
+std::string read(const MemoryMappedFile& map, std::size_t& off)
 {
+    const char* q = map.data();
     const std::size_t x = le64(q + off);
     off += 8;
     std::string t(q + off, x);
@@ -142,31 +139,7 @@ void Database::save(const std::string & file) const
 
 void Database::load(const std::string & file)
 {
-    const int fd = ::open(file.c_str(), O_RDONLY );
-    if (fd == -1)
-    {
-        return;
-    }
-
-    off_t file_size = 0;
-    {
-        struct stat buf;
-        if (::fstat(fd, &buf) != 0 || !S_ISREG(buf.st_mode))
-        {
-            ::close(fd);
-            return;
-        }
-        file_size = buf.st_size;
-    }
-
-    void* map_ = ::mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (!map_)
-    {
-        ::close(fd);
-        return;
-    }
-
-    const char* map = static_cast< char* >(map_);
+    MemoryMappedFile map(file);
 
     std::vector< Collection > c2;
 
@@ -229,10 +202,6 @@ void Database::load(const std::string & file)
     }
 
     c2.swap(collections);
-
-    ::munmap(map_, file_size);
-    ::close(fd);
-
 }
 }
 

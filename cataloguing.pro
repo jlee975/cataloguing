@@ -30,7 +30,8 @@ SOURCES += \
     marc/database.cpp \
     collectionmodel.cpp \
     recordmodel.cpp \
-    marc/marcxml.cpp
+    marc/marcxml.cpp \
+    memorymappedfile.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +40,8 @@ HEADERS += \
     collectionmodel.h \
     recordmodel.h \
     tree.h \
-    marc/marcxml.h
+    marc/marcxml.h \
+    memorymappedfile.h
 
 FORMS += \
         mainwindow.ui
