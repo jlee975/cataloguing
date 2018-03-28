@@ -53,21 +53,21 @@ marc::record_type to_record_type(const xmlChar* content)
         switch (content[0])
         {
         case '\x41':
-            if (std::memcmp(content, authority_tag, 10) == 0)
+            if (xmlStrEqual(content, authority_tag))
                 return marc::authority;
             break;
         case '\x42':
-            if (std::memcmp(content, bibliographic_tag, 14) == 0)
+            if (xmlStrEqual(content, bibliographic_tag))
                 return marc::bibliographic;
             break;
         case '\x43':
-            if (std::memcmp(content, classification_tag, 15) == 0)
+            if (xmlStrEqual(content, classification_tag))
                     return marc::classification;
-            if (std::memcmp(content, community_tag, 10) == 0)
+            if (xmlStrEqual(content, community_tag))
                     return marc::community;
             break;
         case '\x48':
-            if (std::memcmp(content, holdings_tag, 9) == 0)
+            if (xmlStrEqual(content, holdings_tag))
                     return marc::holdings;
             break;
         }
@@ -183,20 +183,20 @@ public:
 
     void set_attribute(const xmlChar* name, const xmlChar* value)
     {
-        if (std::memcmp(name, id_tag, 3) == 0)
+        if (xmlStrEqual(name, id_tag))
             elements.back()->set_id(reinterpret_cast< const char* >(value));
         else
             switch(elements.back()->classify())
             {
             case marc::record:
-                if (std::memcmp(name, type_tag, 5) == 0)
+                if (xmlStrEqual(name, type_tag))
                 {
                     static_cast< marc::Record* >(elements.back())->set_type(to_record_type(value));
                 }
                 else throw std::runtime_error("Unrecognized record attribute");
                 break;
             case marc::controlfield:
-                if (std::memcmp(name, tag_tag, 4) == 0)
+                if (xmlStrEqual(name, tag_tag))
                 {
                     if (value[0] == 48 && value[1] == 48 && is_digit_or_letter(value[2]) && value[3] == '\0')
                     {
@@ -207,18 +207,18 @@ public:
                 else throw std::runtime_error("Unrecognized controlfield attribute");
                 break;
             case marc::datafield:
-                if (std::memcmp(name, tag_tag, 4) == 0)
+                if (xmlStrEqual(name, tag_tag))
                 {
                     static_cast< marc::DataField* >(elements.back())->set_tag(marc::Tag(reinterpret_cast< const char* >(value)));
                 }
-                else if (std::memcmp(name, ind1_tag, 5) == 0)
+                else if (xmlStrEqual(name, ind1_tag))
                 {
                     if (allowed_indicator_character(value[0]) && value[1] == '\0')
                         static_cast< marc::DataField* >(elements.back())->set_indicator1(static_cast< marc::indicator_type >(value[0]));
                     else
                         throw std::runtime_error("Illegal value for ind1");
                 }
-                else if (std::memcmp(name, ind2_tag, 5) == 0)
+                else if (xmlStrEqual(name, ind2_tag))
                 {
                     if (allowed_indicator_character(value[0]) && value[1] == '\0')
                         static_cast< marc::DataField* >(elements.back())->set_indicator2(static_cast< marc::indicator_type >(value[0]));
@@ -228,7 +228,7 @@ public:
                 else throw std::runtime_error("Unrecognized datafield attribute");
                 break;
             case marc::subfield:
-                if (std::memcmp(name, code_tag, 5) == 0)
+                if (xmlStrEqual(name, code_tag))
                 {
                     if (allowed_code_character(value[0]) && value[1] == '\0')
                         static_cast< marc::SubField* >(elements.back())->set_code(static_cast< marc::subfield_code >(value[0]));
