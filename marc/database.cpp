@@ -34,12 +34,23 @@ std::string read(const MemoryMappedFile& map, std::size_t& off)
 
 namespace marc
 {
+/// @todo Don't use streams. We never write formatted data
+/// @todo Don't use 'c', 'r', etc. Use enums
+/// @todo Strings should be prepended with a byte indicating length (if short) or 8-byte length followed by string content
+/// @todo 4 byte length instead of 8 byte lengths
+/// @todo Compressed fields where possible (ex., Leader pretty much always ends with 4500, no need to store it)
 class DatabaseFileWriter
 {
 public:
     explicit DatabaseFileWriter(const std::string& path) : out(path)
     {
+    }
+
+    template< typename T >
+    void append(const T& x)
+    {
         out.seekp(0, std::ios_base::end);
+        write(x);
     }
 
     void write(const std::vector< Collection >& collections)
@@ -58,9 +69,9 @@ public:
         const auto startc = out.tellp();
         out.write(buf, 8); // reserve 8 bytes for the size of the collection
 
-        for (std::size_t ir = 0, nr = c.size(); ir < nr; ++ir)
+        for (std::size_t i = 0, n = c.size(); i < n; ++i)
         {
-            write(c.record(ir));
+            write(c.record(i));
         }
 
         const auto endc = out.tellp();
@@ -78,21 +89,20 @@ public:
         const auto startr = out.tellp();
         out.write(buf, 8);
 
-
         // Write Leaders
-        for (std::size_t il = 0, nl = r.num_leaders(); il < nl; ++il)
+        for (std::size_t i = 0, n = r.num_leaders(); i < n; ++i)
         {
-            write(r.get_leader(il));
+            write(r.get_leader(i));
         }
 
-        for (std::size_t ic = 0, nc = r.num_controlfields(); ic < nc; ++ic)
+        for (std::size_t i = 0, n = r.num_controlfields(); i < n; ++i)
         {
-            write(r.get_controlfield(ic));
+            write(r.get_controlfield(i));
         }
 
-        for (std::size_t id = 0, nd = r.num_datafields(); id < nd; ++id)
+        for (std::size_t i = 0, n = r.num_datafields(); i < n; ++i)
         {
-            write(r.get_datafield(id));
+            write(r.get_datafield(i));
         }
 
         const auto endr = out.tellp();
@@ -159,7 +169,7 @@ void Database::insert(Collection c)
         // unmap
         file.close();
 
-        w.write(c);
+        w.append(c);
     }
 
     // remap
@@ -247,7 +257,7 @@ Record Database::load_record(std::size_t off) const
 void Database::save(const std::string & path, const std::vector< Collection >& collections)
 {
     DatabaseFileWriter w(path);
-    w.write(collections);
+    w.append(collections);
 }
 
 void Database::load(const std::string & path)
