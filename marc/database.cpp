@@ -166,16 +166,16 @@ void Database::load(const std::string & file)
                 in.get();
                 Leader l;
                 l.set_content(read(in));
-                rec.insert(std::move(l));
+                rec.append(std::move(l));
             }
 
             while (in.peek() == 'f')
             {
                 in.get();
                 ControlField f;
-                f.set_tag(read(in));
+                f.set_tag(Tag(read(in)));
                 f.set_content(read(in));
-                rec.insert(std::move(f));
+                rec.append(std::move(f));
             }
 
             while (in.peek() == 'd')
@@ -183,7 +183,7 @@ void Database::load(const std::string & file)
                 in.get();
                 DataField d;
 
-                d.set_tag(read(in));
+                d.set_tag(Tag(read(in)));
                 d.set_indicator1(read(in));
                 d.set_indicator2(read(in));
 
@@ -193,13 +193,13 @@ void Database::load(const std::string & file)
                     SubField s;
                     s.set_code(read(in));
                     s.set_content(read(in));
-                    d.insert(std::move(s));
+                    d.append(std::move(s));
                 }
 
-                rec.insert(std::move(d));
+                rec.append(std::move(d));
             }
 
-            coll.insert(std::move(rec));
+            coll.append(std::move(rec));
         }
         c2.push_back(std::move(coll));
     }

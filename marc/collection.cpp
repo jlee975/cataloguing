@@ -61,21 +61,25 @@ bool is_digit_or_letter(char c)
     return (48 <= c && c <= 57) || (65 <= c && c <= 90) || (97 <= c && c <= 122);
 }
 
-bool is_tag_string(const char* s)
+bool is_tag_string(const std::string& s)
 {
-    if (s[0] == 48)
+    if (s.length() == 3)
     {
-        // 0([1-9A-Z][0-9A-Z])
-        // 0([1-9a-z][0-9a-z])
-        return ((is_digit_or_major(s[1]) && is_digit_or_major(s[2])) || (is_digit_or_minor(s[1]) && is_digit_or_minor(s[2]))) && s[3] == 0;
+        if (s[0] == 48)
+        {
+            // 0([1-9A-Z][0-9A-Z])
+            // 0([1-9a-z][0-9a-z])
+            return ((is_digit_or_major(s[1]) && is_digit_or_major(s[2])) || (is_digit_or_minor(s[1]) && is_digit_or_minor(s[2]))) && s[3] == 0;
+        }
+        else
+        {
+            // [1-9A-Z][0-9A-Z]{2}
+            // [1-9a-z][0-9a-z]{2}
+            return ((is_digit_or_major(s[0]) && is_digit_or_major(s[1]) && is_digit_or_major(s[2]))
+                    || (is_digit_or_minor(s[0]) && is_digit_or_minor(s[1]) && is_digit_or_minor(s[2]))) && s[3] == 0;
+        }
     }
-    else
-    {
-        // [1-9A-Z][0-9A-Z]{2}
-        // [1-9a-z][0-9a-z]{2}
-        return ((is_digit_or_major(s[0]) && is_digit_or_major(s[1]) && is_digit_or_major(s[2]))
-                || (is_digit_or_minor(s[0]) && is_digit_or_minor(s[1]) && is_digit_or_minor(s[2]))) && s[3] == 0;
-    }
+    return false;
 }
 
 bool is_whitespace(const char* p)
@@ -164,7 +168,7 @@ const std::string& SubField::get_content() const
     return content_;
 }
 
-void SubField::set_content(std::string && s)
+void SubField::set_content(std::string s)
 {
     content_ = std::move(s);
 }
@@ -197,7 +201,7 @@ void DataField::set_attribute_(const char* name, const char* content)
     else throw std::runtime_error("Unrecognized datafield attribute");
 }
 
-void DataField::append(SubField && f)
+void DataField::append(SubField f)
 {
     subfields_.push_back(std::move(f));
 }
@@ -217,9 +221,9 @@ const Tag& DataField::get_tag() const
     return tag_;
 }
 
-void DataField::set_tag(const std::string & s)
+void DataField::set_tag(Tag t)
 {
-    tag_ = Tag(s.data());
+    tag_ = t;
 }
 
 indicator_type DataField::get_indicator1() const
@@ -235,11 +239,6 @@ void DataField::set_indicator1(const std::string & s)
 void DataField::set_indicator2(const std::string & s)
 {
     ind2_ = static_cast< indicator_type >(s.at(0));
-}
-
-void DataField::insert(SubField && f)
-{
-    subfields_.push_back(std::move(f));
 }
 
 indicator_type DataField::get_indicator2() const
@@ -275,9 +274,9 @@ const Tag& ControlField::get_tag() const
     return tag_;
 }
 
-void ControlField::set_tag(const std::string & s)
+void ControlField::set_tag(Tag t)
 {
-    tag_ = Tag(s.data());
+    tag_ = t;
 }
 
 const std::string& ControlField::get_content() const
@@ -285,7 +284,7 @@ const std::string& ControlField::get_content() const
     return content_;
 }
 
-void ControlField::set_content(std::string && s)
+void ControlField::set_content(std::string s)
 {
     content_ = std::move(s);
 }
@@ -310,7 +309,7 @@ const std::string& Leader::get_content() const
     return content_;
 }
 
-void Leader::set_content(std::string && s)
+void Leader::set_content(std::string s)
 {
     content_ = std::move(s);
 }
@@ -340,17 +339,17 @@ void Record::set_attribute_(const char* name, const char* content)
     else throw std::runtime_error("Unrecognized record attribute");
 }
 
-void Record::append(Leader && l)
+void Record::append(Leader l)
 {
     leaders.push_back(std::move(l));
 }
 
-void Record::append(ControlField && f)
+void Record::append(ControlField f)
 {
     controlfields.push_back(std::move(f));
 }
 
-void Record::append(DataField &&f)
+void Record::append(DataField f)
 {
     datafields.push_back(std::move(f));
 }
@@ -387,21 +386,6 @@ const DataField &Record::get_datafield(std::size_t i) const
     return datafields.at(i);
 }
 
-void Record::insert(Leader &&l)
-{
-    leaders.push_back(std::move(l));
-}
-
-void Record::insert(ControlField && f)
-{
-    controlfields.push_back(std::move(f));
-}
-
-void Record::insert(DataField && f)
-{
-    datafields.push_back(std::move(f));
-}
-
 std::size_t Record::num_datafields() const
 {
     return datafields.size();
@@ -417,7 +401,7 @@ void Collection::set_attribute_(const char*, const char*)
     throw std::runtime_error("Unrecognized collection attribute");
 }
 
-void Collection::append(Record && r)
+void Collection::append(Record r)
 {
     records.push_back(std::move(r));
 }
@@ -439,17 +423,12 @@ const Record& Collection::record(std::size_t i) const
     return records.at(i);
 }
 
-void Collection::insert(Record && r)
-{
-    records.push_back(std::move(r));
-}
-
 Identifier::Identifier(std::string s) : id_(std::move(s))
 {
 
 }
 
-Tag::Tag(const char * content)
+Tag::Tag(const std::string& content)
 {
     if (is_tag_string(content))
     {
