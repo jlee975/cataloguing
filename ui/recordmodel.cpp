@@ -24,8 +24,8 @@ QVariant RecordModel::headerData(int section, Qt::Orientation orientation, int r
 QModelIndex RecordModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!parent.isValid())
-        return createIndex(row, column, tree_.get_root(row));
-    return createIndex(row, column, tree_.get_child(parent.internalId(), row));
+        return createIndex(row, column, tree_.child(row));
+    return createIndex(row, column, tree_.child(parent.internalId(), row));
 }
 
 QModelIndex RecordModel::parent(const QModelIndex &index) const
@@ -42,9 +42,9 @@ QModelIndex RecordModel::parent(const QModelIndex &index) const
 int RecordModel::rowCount(const QModelIndex &parent) const
 {
     if (!parent.isValid())
-        return tree_.number_of_roots();
+        return tree_.child_count();
 
-    return tree_.number_of_children(parent.internalId());
+    return tree_.child_count(parent.internalId());
 }
 
 int RecordModel::columnCount(const QModelIndex &parent) const
@@ -59,7 +59,7 @@ QVariant RecordModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole)
     {
-        const derp& d = tree_.value(index.internalId());
+        const derp& d = tree_.at(index.internalId());
 
         if (index.column() == 0)
             return d.first;
@@ -76,14 +76,14 @@ void RecordModel::reset(const marc::Record & r_)
 
     for (std::size_t i = 0, n = r_.num_leaders(); i < n; ++i)
     {
-        tree2.add_root(derp{"Leader", QString::fromStdString(r_.get_leader(i).get_content())});
+        tree2.insert(derp{"Leader", QString::fromStdString(r_.get_leader(i).get_content())});
     }
 
     for (std::size_t i = 0, n = r_.num_controlfields(); i < n; ++i)
     {
         const auto& c = r_.get_controlfield(i);
         const std::string_view& s = c.get_tag().to_string();
-        tree2.add_root(derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(c.get_content())});
+        tree2.insert(derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(c.get_content())});
     }
 
     for (std::size_t i = 0, n = r_.num_datafields(); i < n; ++i)
@@ -93,14 +93,14 @@ void RecordModel::reset(const marc::Record & r_)
 
         const std::string_view& ind1 = to_string(f.get_indicator1());
         const std::string_view& ind2 = to_string(f.get_indicator2());
-        const std::size_t j = tree2.add_root(derp{QString::fromLatin1(t.data(), t.length()), "Data Field Description"});
-        tree2.add_child(j, derp{"ind1", QString::fromLatin1(ind1.data(), ind1.length())});
-        tree2.add_child(j, derp{"ind2", QString::fromLatin1(ind2.data(), ind2.length())});
+        const std::size_t j = tree2.insert(derp{QString::fromLatin1(t.data(), t.length()), "Data Field Description"});
+        tree2.insert(j, derp{"ind1", QString::fromLatin1(ind1.data(), ind1.length())});
+        tree2.insert(j, derp{"ind2", QString::fromLatin1(ind2.data(), ind2.length())});
         for (std::size_t k = 0, m = f.num_subfields(); k < m; ++k)
         {
             const auto& sf = f.get_subfield(k);
             const std::string_view& s = to_string(sf.get_code());
-            tree2.add_child(j, derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(sf.get_content())});
+            tree2.insert(j, derp{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(sf.get_content())});
         }
     }
 

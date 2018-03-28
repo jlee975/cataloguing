@@ -15,7 +15,7 @@ public:
 
     tree() { }
 
-    key_type add_root(const T& x)
+    key_type insert(const T& x)
     {
         const key_type i = nodes.size();
         nodes.push_back(node{INVALID, { }, x});
@@ -23,7 +23,7 @@ public:
         return i;
     }
 
-    key_type add_child(key_type parent, const T& x)
+    key_type insert(key_type parent, const T& x)
     {
         if (parent < nodes.size())
         {
@@ -36,12 +36,12 @@ public:
         throw std::runtime_error("just no");
     }
 
-    key_type get_root(size_type i) const
+    key_type child(size_type i) const
     {
         return roots.at(i);
     }
 
-    key_type get_child(key_type i, size_type j) const
+    key_type child(key_type i, size_type j) const
     {
         return nodes.at(i).children.at(j);
     }
@@ -57,30 +57,29 @@ public:
 
         if (p == -1)
         {
-            for (std::size_t i = 0; i < roots.size(); ++i)
+            for (std::size_t i = 0, n = roots.size(); i < n; ++i)
                 if (roots[i] == id)
                     return i;
             throw std::logic_error("What");
         }
 
-        for (std::size_t i = 0; i < nodes.at(p).children.size(); ++i)
+        for (std::size_t i = 0, n= nodes.at(p).children.size(); i < n; ++i)
             if (nodes[p].children[i] == id)
                 return i;
         throw std::logic_error("What");
 
     }
 
-    size_type number_of_roots() const
+    size_type child_count(key_type i = INVALID) const
     {
-        return roots.size();
+        if (i == INVALID)
+            return roots.size();
+        if (i < nodes.size())
+            return nodes[0].children.size();
+        return 0;
     }
 
-    size_type number_of_children(key_type i) const
-    {
-        return nodes.at(i).children.size();
-    }
-
-    const T& value(key_type i) const
+    const T& at(key_type i) const
     {
         return nodes.at(i).value;
     }
