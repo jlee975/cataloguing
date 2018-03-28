@@ -5,13 +5,6 @@
 #include <set>
 #include <cstring>
 
-const char id_tag[] = "\x69\x64";
-const char tag_tag[] = "\x74\x61\x67";
-const char ind1_tag[] = "\x69\x6e\x64\x31";
-const char ind2_tag[] = "\x69\x6e\x64\x32";
-const char code_tag[] = "\x63\x6f\x64\x65";
-const char type_tag[] = "\x74\x79\x70\x65";
-
 const char ascii_character_strings[256] = {
     '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f',
     '\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f',
