@@ -3,6 +3,12 @@
 #include <iostream>
 #include <fstream>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+
 namespace
 {
 void le64(char* buf, std::uint64_t x)
@@ -29,15 +35,12 @@ void write(std::ostream& os, const std::string_view& s)
     os.write(s.data(), n);
 }
 
-std::string read(std::istream& is)
+std::string read(const char* q, std::size_t& off)
 {
-    char buf[8];
-    is.read(buf, 8);
-    const std::size_t x = le64(buf);
-    char* p = new char[x];
-    is.read(p, x);
-    std::string t(p, x);
-    delete[] p;
+    const std::size_t x = le64(q + off);
+    off += 8;
+    std::string t(q + off, x);
+    off += x;
     return t;
 }
 
@@ -139,60 +142,81 @@ void Database::save(const std::string & file) const
 
 void Database::load(const std::string & file)
 {
-    std::ifstream in(file);
-
-    if (!in.is_open())
+    const int fd = ::open(file.c_str(), O_RDONLY );
+    if (fd == -1)
+    {
         return;
+    }
 
-    char buf[8];
+    off_t file_size = 0;
+    {
+        struct stat buf;
+        if (::fstat(fd, &buf) != 0 || !S_ISREG(buf.st_mode))
+        {
+            ::close(fd);
+            return;
+        }
+        file_size = buf.st_size;
+    }
+
+    void* map_ = ::mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (!map_)
+    {
+        ::close(fd);
+        return;
+    }
+
+    const char* map = static_cast< char* >(map_);
 
     std::vector< Collection > c2;
 
-    while (in.peek() == 'c')
+    std::size_t off = 0;
+
+    while (map[off] == 'c')
     {
         Collection coll;
 
-        in.get();
-        in.read(buf, 8);
+        ++off;
+        off += 8;
 
-        while (in.peek() == 'r')
+        while (map[off] == 'r')
         {
-            in.get();
+            ++off;
             Record rec;
 
-            in.read(buf, 8);
-            while (in.peek() == 'l')
+            off += 8;
+            while (map[off] == 'l')
             {
-                in.get();
+                ++off;
                 Leader l;
-                l.set_content(read(in));
+                l.set_content(read(map, off));
                 rec.append(std::move(l));
             }
 
-            while (in.peek() == 'f')
+            while (map[off] == 'f')
             {
-                in.get();
+                ++off;
                 ControlField f;
-                f.set_tag(Tag(read(in)));
-                f.set_content(read(in));
+                f.set_tag(Tag(read(map, off)));
+                f.set_content(read(map, off));
                 rec.append(std::move(f));
             }
 
-            while (in.peek() == 'd')
+            while (map[off] == 'd')
             {
-                in.get();
+                ++off;
                 DataField d;
 
-                d.set_tag(Tag(read(in)));
-                d.set_indicator1(read(in));
-                d.set_indicator2(read(in));
+                d.set_tag(Tag(read(map, off)));
+                d.set_indicator1(read(map, off));
+                d.set_indicator2(read(map, off));
 
-                while (in.peek() == 's')
+                while (map[off] == 's')
                 {
-                    in.get();
+                    ++off;
                     SubField s;
-                    s.set_code(read(in));
-                    s.set_content(read(in));
+                    s.set_code(read(map, off));
+                    s.set_content(read(map, off));
                     d.append(std::move(s));
                 }
 
@@ -205,6 +229,10 @@ void Database::load(const std::string & file)
     }
 
     c2.swap(collections);
+
+    ::munmap(map_, file_size);
+    ::close(fd);
+
 }
 }
 
