@@ -33,15 +33,15 @@ public:
     void clear();
 
 private:
-    struct derp
+    struct field_info
     {
-        QString first;
-        QString second;
+        QString field;
+        QString content;
     };
 
-    static tree< derp >::key_type to_key(const QModelIndex&);
+    static tree< field_info >::key_type to_key(const QModelIndex&);
 
-    tree< derp > tree_;
+    tree< field_info > tree_;
 };
 
 #endif // RECORDMODEL_H
