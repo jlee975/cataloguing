@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 
+/// @todo emplace
 template< typename T >
 class tree
 {

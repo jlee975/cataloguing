@@ -12,6 +12,8 @@ class RecordModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum { FIELD, CONTENT, NUMBER_OF_COLUMNS };
+
     explicit RecordModel(QObject *parent = nullptr);
 
     // Header:

@@ -11,9 +11,9 @@ QVariant RecordModel::headerData(int section, Qt::Orientation orientation, int r
     {
         switch (section)
         {
-        case 0:
+        case FIELD:
             return "Field";
-        case 1:
+        case CONTENT:
             return "Content";
         }
     }
@@ -49,7 +49,7 @@ int RecordModel::rowCount(const QModelIndex &parent) const
 
 int RecordModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    return NUMBER_OF_COLUMNS;
 }
 
 QVariant RecordModel::data(const QModelIndex &index, int role) const
@@ -61,10 +61,13 @@ QVariant RecordModel::data(const QModelIndex &index, int role) const
     {
         const derp& d = tree_.at(index.internalId());
 
-        if (index.column() == 0)
+        switch (index.column())
+        {
+        case FIELD:
             return d.first;
-        if (index.column() == 1)
+        case CONTENT:
             return d.second;
+        }
     }
 
     return QVariant();
