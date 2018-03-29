@@ -39,6 +39,8 @@ private:
         QString second;
     };
 
+    static tree< derp >::key_type to_key(const QModelIndex&);
+
     tree< derp > tree_;
 };
 

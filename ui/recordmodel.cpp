@@ -23,9 +23,7 @@ QVariant RecordModel::headerData(int section, Qt::Orientation orientation, int r
 
 QModelIndex RecordModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return createIndex(row, column, tree_.child(row));
-    return createIndex(row, column, tree_.child(parent.internalId(), row));
+    return createIndex(row, column, tree_.child(to_key(parent), row));
 }
 
 QModelIndex RecordModel::parent(const QModelIndex &index) const
@@ -41,10 +39,7 @@ QModelIndex RecordModel::parent(const QModelIndex &index) const
 
 int RecordModel::rowCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return tree_.child_count();
-
-    return tree_.child_count(parent.internalId());
+    return tree_.child_count(to_key(parent));
 }
 
 int RecordModel::columnCount(const QModelIndex &parent) const
@@ -119,4 +114,9 @@ void RecordModel::clear()
     beginResetModel();
     tree_.swap(tree2);
     endResetModel();
+}
+
+tree<RecordModel::derp>::key_type RecordModel::to_key(const QModelIndex & idx)
+{
+    return idx.isValid() ? idx.internalId() : tree<derp>::INVALID;
 }
