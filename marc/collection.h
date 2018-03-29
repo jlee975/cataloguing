@@ -5,16 +5,12 @@
 #include <string>
 #include <string_view>
 
+#include "indicator_type.h"
+
 namespace marc
 {
 enum classification_type { invalid_classification, collection, record, leader, controlfield, datafield, subfield };
 enum record_type { invalid_record, bibliographic, authority, holdings, classification, community };
-
-enum class indicator_type : unsigned char { invalid, space, digit0, digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, digit9, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z };
-
-indicator_type ascii_to_indicator(unsigned char value_);
-std::string_view to_string(indicator_type value);
-
 enum class subfield_code : unsigned char { first = 33, last = 126 };
 
 std::string_view to_string(subfield_code);
