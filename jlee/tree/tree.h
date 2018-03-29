@@ -10,30 +10,31 @@ class tree
 public:
     typedef std::size_t key_type;
     typedef std::size_t size_type;
+    typedef T value_type;
 
-    static const key_type INVALID = key_type(-1);
+    static const key_type INVALID = -1;
 
-    tree() { }
+    tree() = default;
 
-    key_type insert(const T& x)
+    key_type insert(const value_type& x)
     {
         const key_type i = nodes.size();
-        nodes.push_back(node{INVALID, { }, x});
+        nodes.emplace_back(x);
         roots.push_back(i);
         return i;
     }
 
-    key_type insert(key_type parent, const T& x)
+    key_type insert(key_type parent, const value_type& x)
     {
         if (parent < nodes.size())
         {
             const key_type i = nodes.size();
-            nodes.push_back(node{parent, { }, x});
+            nodes.emplace_back(parent, x);
             nodes[parent].children.push_back(i);
             return i;
         }
 
-        throw std::runtime_error("just no");
+        throw std::runtime_error("Parent node does not exist");
     }
 
     key_type child(size_type i) const
@@ -79,7 +80,7 @@ public:
         return 0;
     }
 
-    const T& at(key_type i) const
+    const value_type& at(key_type i) const
     {
         return nodes.at(i).value;
     }
@@ -92,6 +93,17 @@ public:
 private:
     struct node
     {
+        explicit node(const T& value_)
+            : parent(INVALID), value(value_)
+        {
+
+        }
+
+        node(key_type parent_, const T& value_)
+            : parent(parent_), value(value_)
+        {
+
+        }
         key_type parent;
         std::vector< key_type > children;
         T value;
