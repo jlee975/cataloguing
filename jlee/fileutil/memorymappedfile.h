@@ -16,12 +16,10 @@ public:
     void swap(MemoryMappedFile&);
     char operator[](std::size_t) const;
     const char* data() const;
-    const std::string& get_path() const;
     void open(const std::string&);
     void close();
     std::size_t size() const;
 private:
-    std::string path;
     std::size_t size_;
     void* mapping;
 };

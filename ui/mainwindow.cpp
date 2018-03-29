@@ -7,7 +7,7 @@
 #include "marcxml.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow)
+    QMainWindow(parent), ui(new Ui::MainWindow), database("/home/jonathan/marc")
 {
     ui->setupUi(this);
 

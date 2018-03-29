@@ -130,8 +130,8 @@ public:
     {
         out.write("d", 1);
         write(df.get_tag().to_string());
-        write(to_string(df.get_indicator1()));
-        write(to_string(df.get_indicator2()));
+        write(static_cast< unsigned char >(df.get_indicator1()));
+        write(static_cast< unsigned char >(df.get_indicator2()));
 
         for (std::size_t is = 0, ns = df.num_subfields(); is < ns; ++is)
         {
@@ -155,16 +155,30 @@ public:
         out.write(s.data(), n);
     }
 
+    void write(unsigned char c)
+    {
+        char buf[1] = { static_cast< char >(c) };
+        out.write(buf, 1);
+    }
+
 private:
     std::ofstream out;
 };
 
+Database::Database(std::string s) : path(std::move(s))
+{
+    reload();
+}
+
+void Database::reload()
+{
+    load(path);
+}
+
 void Database::insert(Collection c)
 {
-    const std::string s = file.get_path();
-
     {
-        DatabaseFileWriter w(s);
+        DatabaseFileWriter w(path);
 
         // unmap
         file.close();
@@ -173,7 +187,7 @@ void Database::insert(Collection c)
     }
 
     // remap
-    load(s);
+    reload();
 }
 
 std::size_t Database::size(std::size_t i) const
@@ -236,8 +250,8 @@ Record Database::load_record(std::size_t off) const
         DataField d;
 
         d.set_tag(Tag(read(file, off)));
-        d.set_indicator1(static_cast< indicator_type >(read(file, off).at(0)));
-        d.set_indicator2(static_cast< indicator_type >(read(file, off).at(0)));
+        d.set_indicator1(static_cast< indicator_type >(file[off++]));
+        d.set_indicator2(static_cast< indicator_type >(file[off++]));
 
         while (file[off] == 's')
         {
@@ -260,9 +274,9 @@ void Database::save(const std::string & path, const std::vector< Collection >& c
     w.append(collections);
 }
 
-void Database::load(const std::string & path)
+void Database::load(std::string path_)
 {
-    MemoryMappedFile map(path);
+    MemoryMappedFile map(path_);
 
     const std::size_t n = map.size();
 
@@ -285,6 +299,7 @@ void Database::load(const std::string & path)
         c2.push_back(std::move(rs));
     }
 
+    path = std::move(path_);
     colls = std::move(c2);
     file = std::move(map);
 }

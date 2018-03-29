@@ -5,6 +5,8 @@
 
 #include <libxml/parser.h>
 
+#include "collection.h"
+
 // elements
 const xmlChar collection_tag[] = { '\x63','\x6f','\x6c','\x6c','\x65','\x63','\x74','\x69','\x6f','\x6e',0 };
 const xmlChar record_tag[] = { '\x72','\x65','\x63','\x6f','\x72','\x64',0 };
@@ -214,14 +216,14 @@ public:
                 else if (xmlStrEqual(name, ind1_tag))
                 {
                     if (allowed_indicator_character(value[0]) && value[1] == '\0')
-                        static_cast< marc::DataField* >(elements.back())->set_indicator1(static_cast< marc::indicator_type >(value[0]));
+                        static_cast< marc::DataField* >(elements.back())->set_indicator1(marc::ascii_to_indicator(value[0]));
                     else
                         throw std::runtime_error("Illegal value for ind1");
                 }
                 else if (xmlStrEqual(name, ind2_tag))
                 {
                     if (allowed_indicator_character(value[0]) && value[1] == '\0')
-                        static_cast< marc::DataField* >(elements.back())->set_indicator2(static_cast< marc::indicator_type >(value[0]));
+                        static_cast< marc::DataField* >(elements.back())->set_indicator2(marc::ascii_to_indicator(value[0]));
                     else
                         throw std::runtime_error("Illegal value for ind1");
                 }

@@ -12,7 +12,7 @@ MemoryMappedFile::MemoryMappedFile() : mapping(nullptr)
 {
 }
 
-MemoryMappedFile::MemoryMappedFile(const std::string & path_)
+MemoryMappedFile::MemoryMappedFile(const std::string& path_)
     : size_(0), mapping(nullptr)
 {
     const int fd_ = ::open(path_.c_str(), O_RDONLY);
@@ -24,7 +24,6 @@ MemoryMappedFile::MemoryMappedFile(const std::string & path_)
         {
             if (void* p = ::mmap(0, buf.st_size, PROT_READ, MAP_PRIVATE, fd_, 0))
             {
-                path = path_;
                 mapping = p;
                 size_ = buf.st_size;
             }
@@ -33,7 +32,7 @@ MemoryMappedFile::MemoryMappedFile(const std::string & path_)
     }
 }
 
-MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : path(std::move(o.path)), size_(o.size_), mapping(o.mapping)
+MemoryMappedFile::MemoryMappedFile(MemoryMappedFile && o) : size_(o.size_), mapping(o.mapping)
 {
     o.size_ = 0;
     o.mapping = nullptr;
@@ -54,7 +53,6 @@ MemoryMappedFile & MemoryMappedFile::operator=(MemoryMappedFile && o)
 
 void MemoryMappedFile::swap(MemoryMappedFile & o)
 {
-    path.swap(o.path);
     std::swap(size_, o.size_);
     std::swap(mapping, o.mapping);
 }
@@ -67,11 +65,6 @@ char MemoryMappedFile::operator[](std::size_t i) const
 const char *MemoryMappedFile::data() const
 {
     return static_cast< char* >(mapping);
-}
-
-const std::string &MemoryMappedFile::get_path() const
-{
-    return path;
 }
 
 void MemoryMappedFile::open(const std::string & path_)
