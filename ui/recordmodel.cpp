@@ -1,5 +1,7 @@
 #include "recordmodel.h"
 
+#include "definitions.h"
+
 RecordModel::RecordModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -88,7 +90,8 @@ void RecordModel::reset(const marc::Record & r_)
     {
         const marc::DataField& f = r_.get_datafield(i);
 
-        const std::size_t j = tree2.emplace(root, f.get_tag().to_string(), "Data Field Description");
+        const auto& t = f.get_tag().to_string();
+        const std::size_t j = tree2.emplace(root, t, marc::get_field_descriptor(t).description);
         tree2.emplace(j, "ind1", to_string(f.get_indicator1()));
         tree2.emplace(j, "ind2", to_string(f.get_indicator2()));
         for (std::size_t k = 0, m = f.num_subfields(); k < m; ++k)

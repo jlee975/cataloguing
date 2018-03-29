@@ -13,12 +13,14 @@ CONFIG -= qt c++11 c++14
 SOURCES += \
     collection.cpp \
     database.cpp \
-    marcxml.cpp
+    marcxml.cpp \
+    definitions.cpp
 
 HEADERS += \
     collection.h \
     database.h \
-    marcxml.h
+    marcxml.h \
+    definitions.h
 
 INCLUDEPATH += $$PWD/../jlee
 INCLUDEPATH += /usr/include/libxml2
