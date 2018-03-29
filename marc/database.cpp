@@ -142,7 +142,7 @@ public:
     void write(const SubField& sf)
     {
         out.write("s", 1);
-        write(to_string(sf.get_code()));
+        write(static_cast< unsigned char >(sf.get_code()));
         write(sf.get_content());
     }
 
@@ -257,7 +257,7 @@ Record Database::load_record(std::size_t off) const
         {
             ++off;
             SubField s;
-            s.set_code(static_cast< subfield_code >(read(file, off).at(0)));
+            s.set_code(static_cast< subfield_code>(file[off++]));
             s.set_content(read(file, off));
             d.append(std::move(s));
         }

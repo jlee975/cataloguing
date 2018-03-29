@@ -43,6 +43,7 @@ bool allowed_code_character(xmlChar c)
     return (33 <= c && c <= 63) || (65 <= c && c <= 123) || (125 <= c && c <= 126);
 }
 
+/// @todo Can probably remove because ascii_to_indicator gives us the same information
 bool allowed_indicator_character(xmlChar c)
 {
     return c == 32 || (48 <= c && c <= 57) || (97 <= c && c <= 122);
@@ -233,7 +234,7 @@ public:
                 if (xmlStrEqual(name, code_tag))
                 {
                     if (allowed_code_character(value[0]) && value[1] == '\0')
-                        static_cast< marc::SubField* >(elements.back())->set_code(static_cast< marc::subfield_code >(value[0]));
+                        static_cast< marc::SubField* >(elements.back())->set_code(marc::ascii_to_subfield_code(value[0]));
                     else
                         throw std::runtime_error("Unrecognized subfield code");
                 }

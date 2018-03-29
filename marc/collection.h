@@ -6,14 +6,12 @@
 #include <string_view>
 
 #include "indicator_type.h"
+#include "subfield_code.h"
 
 namespace marc
 {
 enum classification_type { invalid_classification, collection, record, leader, controlfield, datafield, subfield };
 enum record_type { invalid_record, bibliographic, authority, holdings, classification, community };
-enum class subfield_code : unsigned char { first = 33, last = 126 };
-
-std::string_view to_string(subfield_code);
 
 /// @todo IDs must start with a letter or underscore, and can only contain letters, digits, underscores, hyphens, and periods
 /// Specifically must be an NCName (so unicode letters are allowed)

@@ -15,14 +15,16 @@ SOURCES += \
     database.cpp \
     marcxml.cpp \
     definitions.cpp \
-    indicator_type.cpp
+    indicator_type.cpp \
+    subfield_code.cpp
 
 HEADERS += \
     collection.h \
     database.h \
     marcxml.h \
     definitions.h \
-    indicator_type.h
+    indicator_type.h \
+    subfield_code.h
 
 INCLUDEPATH += $$PWD/../jlee
 INCLUDEPATH += /usr/include/libxml2

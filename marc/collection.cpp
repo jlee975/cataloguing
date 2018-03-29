@@ -76,11 +76,6 @@ bool is_whitespace(const char* p)
 
 namespace marc
 {
-std::string_view to_string(subfield_code c)
-{
-    return {ascii_character_strings + static_cast< unsigned char >(c), 1 };
-}
-
 void MarcBase::set_id(std::string s)
 {
     id_ = Identifier(std::move(s));
