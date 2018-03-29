@@ -33,7 +33,7 @@ QModelIndex RecordModel::parent(const QModelIndex &index) const
     if (index.isValid())
     {
         const auto j = tree_.parent(index.internalId());
-        if (j != -1)
+        if (j != tree< derp >::INVALID)
             return createIndex(tree_.row(j), 0, j);
     }
     return QModelIndex();

@@ -24,6 +24,14 @@ public:
         return i;
     }
 
+    key_type insert(value_type&& x)
+    {
+        const key_type i = nodes.size();
+        nodes.emplace_back(std::move(x));
+        roots.push_back(i);
+        return i;
+    }
+
     key_type insert(key_type parent, const value_type& x)
     {
         if (parent < nodes.size())
@@ -33,6 +41,23 @@ public:
             nodes[parent].children.push_back(i);
             return i;
         }
+        else if (parent == INVALID)
+            return insert(x);
+
+        throw std::runtime_error("Parent node does not exist");
+    }
+
+    key_type insert(key_type parent, value_type&& x)
+    {
+        if (parent < nodes.size())
+        {
+            const key_type i = nodes.size();
+            nodes.emplace_back(parent, std::move(x));
+            nodes[parent].children.push_back(i);
+            return i;
+        }
+        else if (parent == INVALID)
+            return insert(std::move(x));
 
         throw std::runtime_error("Parent node does not exist");
     }
@@ -44,19 +69,26 @@ public:
 
     key_type child(key_type i, size_type j) const
     {
+        if (i == INVALID)
+            return child(j);
         return nodes.at(i).children.at(j);
     }
 
     key_type parent(key_type i) const
     {
+        if (i == INVALID)
+            return INVALID;
         return nodes.at(i).parent;
     }
 
     size_type row(key_type id) const
     {
+        if (id == INVALID)
+            return 0;
+
         const key_type p = nodes.at(id).parent;
 
-        if (p == -1)
+        if (p == INVALID)
         {
             for (std::size_t i = 0, n = roots.size(); i < n; ++i)
                 if (roots[i] == id)
@@ -85,6 +117,11 @@ public:
         return nodes.at(i).value;
     }
 
+    value_type& at(key_type i)
+    {
+        return nodes.at(i).value;
+    }
+
     void swap(tree& o)
     {
         nodes.swap(o.nodes);
@@ -99,11 +136,24 @@ private:
 
         }
 
+        explicit node(T&& value_)
+            : parent(INVALID), value(std::move(value_))
+        {
+
+        }
+
         node(key_type parent_, const T& value_)
             : parent(parent_), value(value_)
         {
 
         }
+
+        node(key_type parent_, T&& value_)
+            : parent(parent_), value(std::move(value_))
+        {
+
+        }
+
         key_type parent;
         std::vector< key_type > children;
         T value;
