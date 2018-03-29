@@ -35,6 +35,10 @@ public:
 private:
     struct field_info
     {
+        field_info(std::string_view f, std::string_view c)
+            : field(QString::fromUtf8(f.data(), f.length())), content(QString::fromUtf8(c.data(), c.length()))
+        {}
+
         QString field;
         QString content;
     };

@@ -71,48 +71,42 @@ QVariant RecordModel::data(const QModelIndex &index, int role) const
 void RecordModel::reset(const marc::Record & r_)
 {
     tree< field_info > tree2;
+    const auto root = tree< field_info >::INVALID;
 
     for (std::size_t i = 0, n = r_.num_leaders(); i < n; ++i)
     {
-        tree2.insert(field_info{"Leader", QString::fromStdString(r_.get_leader(i).get_content())});
+        tree2.emplace(root, "Leader", r_.get_leader(i).get_content());
     }
 
     for (std::size_t i = 0, n = r_.num_controlfields(); i < n; ++i)
     {
-        const auto& c = r_.get_controlfield(i);
-        const std::string_view& s = c.get_tag().to_string();
-        tree2.insert(field_info{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(c.get_content())});
+        const marc::ControlField& c = r_.get_controlfield(i);
+        tree2.emplace(root, c.get_tag().to_string(), c.get_content());
     }
 
     for (std::size_t i = 0, n = r_.num_datafields(); i < n; ++i)
     {
         const marc::DataField& f = r_.get_datafield(i);
-        const std::string_view& t = f.get_tag().to_string();
 
-        const std::string_view& ind1 = to_string(f.get_indicator1());
-        const std::string_view& ind2 = to_string(f.get_indicator2());
-        const std::size_t j = tree2.insert(field_info{QString::fromLatin1(t.data(), t.length()), "Data Field Description"});
-        tree2.insert(j, field_info{"ind1", QString::fromLatin1(ind1.data(), ind1.length())});
-        tree2.insert(j, field_info{"ind2", QString::fromLatin1(ind2.data(), ind2.length())});
+        const std::size_t j = tree2.emplace(root, f.get_tag().to_string(), "Data Field Description");
+        tree2.emplace(j, "ind1", to_string(f.get_indicator1()));
+        tree2.emplace(j, "ind2", to_string(f.get_indicator2()));
         for (std::size_t k = 0, m = f.num_subfields(); k < m; ++k)
         {
-            const auto& sf = f.get_subfield(k);
-            const std::string_view& s = to_string(sf.get_code());
-            tree2.insert(j, field_info{QString::fromLatin1(s.data(), s.length()), QString::fromStdString(sf.get_content())});
+            const marc::SubField& sf = f.get_subfield(k);
+            tree2.emplace(j, to_string(sf.get_code()), sf.get_content());
         }
     }
 
     beginResetModel();
-    tree_.swap(tree2);
+    tree_ = std::move(tree2);
     endResetModel();
 }
 
 void RecordModel::clear()
 {
-    tree< field_info > tree2;
-
     beginResetModel();
-    tree_.swap(tree2);
+    tree_.clear();
     endResetModel();
 }
 
