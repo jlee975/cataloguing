@@ -130,7 +130,7 @@ public:
         if (i == INVALID)
             return roots.size();
         if (i < nodes.size())
-            return nodes[0].children.size();
+            return nodes[i].children.size();
         return 0;
     }
 
