@@ -63,6 +63,27 @@ public:
         throw std::runtime_error("Parent node does not exist");
     }
 
+    template< typename... Ts >
+    key_type emplace(key_type parent, Ts&&... ts)
+    {
+        const key_type i = nodes.size();
+
+        if (parent < nodes.size())
+        {
+            nodes.emplace_back(parent, std::forward<Ts>(ts)...);
+            nodes[parent].children.push_back(i);
+            return i;
+        }
+        else if (parent == INVALID)
+        {
+            nodes.emplace_back(parent, std::forward<Ts>(ts)...);
+            roots.push_back(i);
+            return i;
+        }
+
+        throw std::runtime_error("Parent node does not exist");
+    }
+
     key_type child(size_type i) const
     {
         return roots.at(i);
@@ -128,6 +149,12 @@ public:
         nodes.swap(o.nodes);
         roots.swap(o.roots);
     }
+
+    void clear()
+    {
+        nodes.clear();
+        roots.clear();
+    }
 private:
     struct node
     {
@@ -151,6 +178,13 @@ private:
 
         node(key_type parent_, T&& value_)
             : parent(parent_), value(std::move(value_))
+        {
+
+        }
+
+        template< typename... Ts >
+        node(key_type parent_, Ts&&... ts)
+            : parent(parent_), value(std::forward<Ts>(ts)...)
         {
 
         }
