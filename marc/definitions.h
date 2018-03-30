@@ -24,7 +24,7 @@ struct indicator_descriptor
 
     std::string description;
 
-    /// @todo number_of_indicator
+    /// @todo flatmap
     std::vector< info > options_;
 };
 
@@ -44,6 +44,8 @@ struct field_descriptor
     std::string full;
     indicator_descriptor first_indicator;
     indicator_descriptor second_indicator;
+
+    /// @todo flatmap
     std::vector< subfield_code_descriptor > subfield_codes;
 };
 
