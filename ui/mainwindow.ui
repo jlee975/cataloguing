@@ -21,7 +21,11 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QTreeView" name="dbview"/>
-      <widget class="QTreeView" name="recordview"/>
+      <widget class="QTreeView" name="recordview">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>

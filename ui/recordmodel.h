@@ -12,7 +12,7 @@ class RecordModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    enum { FIELD, CONTENT, NUMBER_OF_COLUMNS };
+    enum { CODE, DESCRIPTION, VALUE, NUMBER_OF_COLUMNS };
 
     explicit RecordModel(QObject *parent = nullptr);
 
@@ -35,11 +35,13 @@ public:
 private:
     struct field_info
     {
-        field_info(std::string_view f, std::string_view c)
-            : field(QString::fromUtf8(f.data(), f.length())), content(QString::fromUtf8(c.data(), c.length()))
+        field_info(std::string_view f, std::string_view c, std::string_view d = {})
+            : code(QString::fromUtf8(f.data(), f.length())), description(QString::fromUtf8(c.data(), c.length())),
+              content(QString::fromUtf8(d.data(),d.length()))
         {}
 
-        QString field;
+        QString code;
+        QString description;
         QString content;
     };
 

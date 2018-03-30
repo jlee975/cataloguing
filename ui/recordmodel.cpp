@@ -13,10 +13,12 @@ QVariant RecordModel::headerData(int section, Qt::Orientation orientation, int r
     {
         switch (section)
         {
-        case FIELD:
-            return "Field";
-        case CONTENT:
-            return "Content";
+        case CODE:
+            return "Code";
+        case DESCRIPTION:
+            return "Description";
+        case VALUE:
+            return "Value";
         }
     }
 
@@ -60,9 +62,11 @@ QVariant RecordModel::data(const QModelIndex &index, int role) const
 
         switch (index.column())
         {
-        case FIELD:
-            return d.field;
-        case CONTENT:
+        case CODE:
+            return d.code;
+        case DESCRIPTION:
+            return d.description;
+        case VALUE:
             return d.content;
         }
     }
@@ -77,13 +81,13 @@ void RecordModel::reset(const marc::Record & r_)
 
     for (std::size_t i = 0, n = r_.num_leaders(); i < n; ++i)
     {
-        tree2.emplace(root, "Leader", r_.get_leader(i).get_content());
+        tree2.emplace(root, "Leader", std::string_view(), r_.get_leader(i).get_content());
     }
 
     for (std::size_t i = 0, n = r_.num_controlfields(); i < n; ++i)
     {
         const marc::ControlField& c = r_.get_controlfield(i);
-        tree2.emplace(root, c.get_tag().to_string(), c.get_content());
+        tree2.emplace(root, c.get_tag().to_string(), std::string_view(), c.get_content());
     }
 
     for (std::size_t i = 0, n = r_.num_datafields(); i < n; ++i)
@@ -91,13 +95,17 @@ void RecordModel::reset(const marc::Record & r_)
         const marc::DataField& f = r_.get_datafield(i);
 
         const auto& t = f.get_tag().to_string();
-        const std::size_t j = tree2.emplace(root, t, marc::get_field_descriptor(t).description);
-        tree2.emplace(j, "ind1", to_string(f.get_indicator1()));
-        tree2.emplace(j, "ind2", to_string(f.get_indicator2()));
+        const auto& descriptor = marc::get_field_descriptor(t);
+
+        const std::size_t j = tree2.emplace(root, t, descriptor.description);
+        tree2.emplace(j, "ind1", descriptor.first_indicator.description,
+                      descriptor.first_indicator.friendly(f.get_indicator1()));
+        tree2.emplace(j, "ind2", descriptor.second_indicator.description,
+                      descriptor.second_indicator.friendly(f.get_indicator2()));
         for (std::size_t k = 0, m = f.num_subfields(); k < m; ++k)
         {
             const marc::SubField& sf = f.get_subfield(k);
-            tree2.emplace(j, to_string(sf.get_code()), sf.get_content());
+            tree2.emplace(j, to_string(sf.get_code()), std::string_view(), sf.get_content());
         }
     }
 

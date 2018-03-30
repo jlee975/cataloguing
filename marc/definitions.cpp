@@ -38,7 +38,29 @@ const marc::field_descriptor field_descriptors[] =
     { "046", "Special Coded Dates" },
     { "047", "Form of Musical Composition Code" },
     { "048", "Number of Musical Instruments or Voices Code" },
-    { "050", "Library of Congress Call Number" },
+    {
+        "050",
+        "Library of Congress Call Number",
+        "Classification or call number that is taken from Library of Congress Classification or LC Classification Additions and Changes...",
+        { // first indicator
+            "Existence in LC collection",
+            {
+                { marc::indicator_type::space, "No information provided" },
+                { marc::indicator_type::digit0, "Item is in LC" },
+                { marc::indicator_type::digit1, "Item is not in LC" }
+            }
+        },
+        { // Second indicator
+            "Source of call number",
+            {
+                { marc::indicator_type::digit0, "Assigned by LC"},
+                { marc::indicator_type::digit4, "Assigned by agency other than LC" }
+            }
+        },
+        { // Subfield codes
+            { marc::subfield_code::a, "Classification number", true }
+        }
+    },
     { "051", "Library of Congress Copy, Issue, Offprint Statement" },
     { "052", "Geographic Classification" },
     { "055", "Classification Numbers Assigned in Canada" },
@@ -251,6 +273,8 @@ const marc::field_descriptor field_descriptors[] =
 };
 
 const marc::field_descriptor dummy = { };
+const marc::indicator_descriptor::info dummy2 = { };
+const marc::subfield_code_descriptor dummy3 = { };
 
 namespace marc
 {
@@ -261,4 +285,31 @@ const field_descriptor &get_field_descriptor(const std::string_view & code)
             return f;
     return dummy;
 }
+
+const indicator_descriptor::info &indicator_descriptor::find(indicator_type t) const
+{
+    for (const auto& x : options_)
+        if (x.type == t)
+            return x;
+    return dummy2;
+}
+
+std::string indicator_descriptor::friendly(indicator_type t) const
+{
+    std::string s;
+    s += to_string(t);
+    const std::string& x = find(t).description;
+    if(!x.empty())
+        s += " - " + x;
+    return s;
+}
+
+const subfield_code_descriptor& field_descriptor::find(subfield_code t) const
+{
+    for (const auto& x : subfield_codes)
+        if (x.code == t)
+            return x;
+    return dummy3;
+}
+
 }
