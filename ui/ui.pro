@@ -28,12 +28,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     collectionmodel.cpp \
-    recordmodel.cpp
+    recordmodel.cpp \
+    fieldedit.cpp
 
 HEADERS += \
         mainwindow.h \
     collectionmodel.h \
-    recordmodel.h
+    recordmodel.h \
+    fieldedit.h
 
 FORMS += \
         mainwindow.ui
