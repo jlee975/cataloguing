@@ -20,6 +20,28 @@ void FieldEdit::keyPressEvent(QKeyEvent * e)
         {
             switch (k)
             {
+            case Qt::Key_Minus:
+            {
+                // Move to next dollar sign
+                const int pos = cursorPosition();
+                QString s = text();
+                const int n = s.length();
+                int i = pos;
+                for (; i < n; ++i)
+                    if (s[i] == '$')
+                    {
+                        break;
+                    }
+                int j = pos;
+                for (; j > 0; --j)
+                    if (s[j - 1] == '$')
+                    {
+                        break;
+                    }
+                s.remove(j - 1, i - (j - 1));
+                setText(s);
+            }
+                return;
             case Qt::Key_Plus:
                 handling = insert_key_press;
                 return;
@@ -60,7 +82,11 @@ void FieldEdit::keyPressEvent(QKeyEvent * e)
         {
             QString s = "$a" + text();
             setText(s);
-            setCursorPosition(0);
+            setCursorPosition(2);
+        }
+        else
+        {
+            QLineEdit::keyPressEvent(e);
         }
 
         handling = regular_key_press;
