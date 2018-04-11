@@ -14,47 +14,167 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTreeView" name="dbview"/>
-      <widget class="QTreeView" name="recordview">
-       <property name="alternatingRowColors">
-        <bool>true</bool>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Find</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBox_2">
+              <item>
+               <property name="text">
+                <string>contains</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>matches</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>regex</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLineEdit" name="lineEdit_3"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QComboBox" name="comboBox">
+              <item>
+               <property name="text">
+                <string>Title</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Author</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset theme="edit-find"/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Advanced</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QTreeWidget" name="treeWidget">
+              <column>
+               <property name="text">
+                <string>1</string>
+               </property>
+              </column>
+              <item>
+               <property name="text">
+                <string>AND</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Title contains 'knock'</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Author:Surname is 'King'</string>
+                </property>
+               </item>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Results</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QTreeView" name="dbview"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Record</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QTreeView" name="recordview">
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="1">
+            <widget class="FieldEdit" name="lineEdit">
+             <property name="text">
+              <string>$awhat$bderp</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="FieldEdit" name="lineEdit_2"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>040</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>508</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
-    </item>
-    <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="FieldEdit" name="lineEdit">
-        <property name="text">
-         <string>$awhat$bderp</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="FieldEdit" name="lineEdit_2"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>040</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>508</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>

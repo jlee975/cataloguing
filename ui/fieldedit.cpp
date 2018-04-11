@@ -22,7 +22,7 @@ void FieldEdit::keyPressEvent(QKeyEvent * e)
             {
             case Qt::Key_Minus:
             {
-                // Move to next dollar sign
+                // Remove current field
                 const int pos = cursorPosition();
                 QString s = text();
                 const int n = s.length();
